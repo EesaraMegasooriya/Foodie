@@ -1,4 +1,4 @@
-import { useState } from 'react'
+
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css'
 
@@ -37,7 +37,7 @@ function App() {
         <Route path="/events" element={<EventHome />} />
         <Route path="/events/browse" element={<BrowseEvents />} />
         <Route path="/events/create" element={<CreateEvent />} />
-        <Route path="/events/EventSingleView" element={<EventSingleView />} />
+        <Route path="/events/:id" element={<EventSingleView />} />
 
         {/* Add more routes as needed */}
 

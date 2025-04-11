@@ -1,37 +1,41 @@
-import React from 'react'
-import Logo from '../assets/logo.png'
+import React from 'react';
+import { Navbar, Nav, Container } from 'react-bootstrap';
+import { NavLink } from 'react-router-dom';
+import Logo from '../assets/logo.png';
 
 function Header() {
   return (
-    <div>
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <a className="navbar-brand d-flex align-items-center " href="#">
-                <img src={Logo} width="50" height="50" class="d-inline-block align-top" alt=""/>
-            </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
-            <li class="nav-item active">
-                <a class="nav-link" href="#">Home </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#">Posts</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#">Recipies</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link " href="#">Skillshare</a>
-            </li>
-            </ul>
-        </div>
-        </nav>
-    </div>
-  )
+    <Navbar bg="light" expand="lg" sticky="top" className="shadow-sm mb-5">
+      <Container>
+        <Navbar.Brand as={NavLink} to="/" className="d-flex align-items-center gap-2">
+          <img src={Logo} width="45" height="45" alt="Logo" />
+          
+        </Navbar.Brand>
+
+        <Navbar.Toggle aria-controls="main-navbar" />
+
+        <Navbar.Collapse id="main-navbar">
+          <Nav className="ms-auto">
+            <Nav.Link as={NavLink} to="/" exact>
+              Home
+            </Nav.Link>
+            <Nav.Link as={NavLink} to="/posts">
+              Posts
+            </Nav.Link>
+            <Nav.Link as={NavLink} to="/events">
+              Events
+            </Nav.Link>
+            <Nav.Link as={NavLink} to="/recipes">
+              Recipes
+            </Nav.Link>
+            <Nav.Link as={NavLink} to="/skillshare">
+              Skillshare
+            </Nav.Link>
+          </Nav>
+        </Navbar.Collapse>
+      </Container>
+    </Navbar>
+  );
 }
 
-export default Header
-
-
+export default Header;
