@@ -42,7 +42,7 @@ function EventHome() {
   }, []);
 
   return (
-    <div className='p-2'>
+    <div className='p-5'>
     <h2 className='pb-2 text-center fw-bold'>Share Your Creative Skills</h2>
     <div className='d-flex justify-content-center'>
     <p className='text-center w-75'>Join our creative community to host or attend art workshops and events,
@@ -112,7 +112,7 @@ function EventHome() {
                     <strong>{event.instructorName}</strong>
                   </div>
                   <div>
-                    <a href={`/pages/event_management/Event_management_single_view/${event.id}`}>
+                    <a href={`/events/${event.id}`}>
                                               <Button variant="outline-primary">View Details</Button>
                                             </a>
                   </div>

@@ -249,6 +249,17 @@ const [eventData, setEventData] = useState({
           )}
         </Form.Group>
 
+        <Form.Group className='mb-3'>
+  <Form.Label>Category</Form.Label>
+  <Form.Select name='category' value={eventData.category} onChange={handleChange}>
+    <option value="" disabled>Select Category</option>
+    <option value="Workshop">Workshop</option>
+    <option value="Seminar">Seminar</option>
+    <option value="Conference">Conference</option>
+  </Form.Select>
+</Form.Group>
+
+
 
               <Form.Group className='mb-3'>
         <Form.Label>Registration Fee ($)</Form.Label>
@@ -272,17 +283,17 @@ const [eventData, setEventData] = useState({
         <Form.Group className='mb-3'>
           <Form.Label>Participants</Form.Label>
           <Form.Control
-            type='text'
-            name='maxParticipants'
-            value={eventData.maxParticipants}
-            onChange={(e) => {
-              const value = e.target.value;
-              // Allow only numbers and optional one decimal point
-              if (/^\d*\.?\d{0,2}$/.test(value)) {
-                handleChange(e);
-              }
-            }}
-          />
+          type='text'
+          name='maxParticipants'
+          value={eventData.maxParticipants}
+          onChange={(e) => {
+            const value = e.target.value;
+            if (/^\d*$/.test(value)) { //  only whole numbers allowed
+              handleChange(e);
+            }
+          }}
+        />
+
         </Form.Group>
 
         <Form.Group className='mb-3'>

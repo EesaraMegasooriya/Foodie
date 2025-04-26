@@ -153,7 +153,7 @@ function CreateEvent() {
 
   return (
     <div>
-      <div>
+      <div className='px-5'>
         <h2 className='pb-2 text-left fw-bold'>Host an Event</h2>
         <p className='text-left w-100 fw-sm'>
           Share your creative skills with the community by hosting an event. Fill out the form below with your event details.
@@ -200,6 +200,7 @@ function CreateEvent() {
               type="date"
               name="eventDate"
               className="form-control"
+              
               min={new Date().toISOString().split("T")[0]} // disables past dates
               value={eventData.eventDate}
               onChange={handleChange}

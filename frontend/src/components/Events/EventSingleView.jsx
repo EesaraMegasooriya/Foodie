@@ -14,7 +14,7 @@ function EventSingleView() {
   // const userId = localStorage.getItem('userId'); 
 
 
-  const userId = 5; // For testing purposes, replace with actual user ID from localStorage
+  const userId = 1; // For testing purposes, replace with actual user ID from localStorage
 
   const [isRegistered, setIsRegistered] = useState(false);
 
@@ -149,7 +149,7 @@ useEffect(() => {
 
   return (
     
-    <div>
+    <div className='px-5'>
       
         
     <div  className="mb-4">
