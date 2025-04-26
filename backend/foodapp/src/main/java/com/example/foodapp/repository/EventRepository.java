@@ -1,3 +1,4 @@
+
 package com.example.foodapp.repository;
 import java.util.List;
 import com.example.foodapp.model.Event;
@@ -7,4 +8,5 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     
 
 }
+
 

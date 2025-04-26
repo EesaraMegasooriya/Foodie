@@ -1,3 +1,4 @@
+
 package com.example.foodapp.model;
 
 import jakarta.persistence.*;
@@ -46,4 +47,5 @@ public class Event {
     @Column(name = "user_id")
     private List<Long> registeredUsers = new ArrayList<>();
 }
+
 

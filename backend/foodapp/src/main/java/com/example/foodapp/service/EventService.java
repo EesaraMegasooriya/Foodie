@@ -1,3 +1,4 @@
+
 package com.example.foodapp.service;
 
 import com.example.foodapp.model.Event;
@@ -85,3 +86,4 @@ public class EventService {
         return eventRepository.save(event);
     }
 }
+
