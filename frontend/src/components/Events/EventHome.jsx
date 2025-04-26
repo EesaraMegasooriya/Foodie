@@ -21,11 +21,8 @@ function EventHome() {
       try {
        const token = localStorage.getItem('jwt');
   
-        const res = await axios.get('http://localhost:8080/api/events', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+       const res = await axios.get('http://localhost:8080/api/events');
+
       
         const today = new Date(); 
 
