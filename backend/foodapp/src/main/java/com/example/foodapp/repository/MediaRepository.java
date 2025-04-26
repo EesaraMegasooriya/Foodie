@@ -1,5 +1,9 @@
 package com.example.foodapp.repository;
 
-public class MediaRepository {
-    
+import java.util.List;
+import com.example.foodapp.model.Media;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface MediaRepository extends JpaRepository<Media, Long> {
+    List<Media> findByPostId(Long postId);
 }
