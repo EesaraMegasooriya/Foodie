@@ -15,13 +15,13 @@ const OAuthSuccess = () => {
         const { token,name  } = response.data;
         localStorage.setItem('jwt', token);
         localStorage.setItem('name', name);
-        console.log('✅ JWT stored:', token);
+        console.log('JWT stored:', token);
         
 
         // Redirect to home, events page, or dashboard
         navigate('/');
       } catch (error) {
-        console.error('❌ Failed to fetch JWT from backend:', error);
+        console.error(' Failed to fetch JWT from backend:', error);
       }
     };
 

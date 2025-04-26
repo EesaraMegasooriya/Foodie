@@ -13,7 +13,7 @@ function Register() {
   useEffect(() => {
     const token = localStorage.getItem('jwt');
     if (token) {
-      navigate('/'); // ✅ Redirect to homepage if already logged in
+      navigate('/'); //  Redirect to homepage if already logged in
     }
   }, [navigate]);
 
