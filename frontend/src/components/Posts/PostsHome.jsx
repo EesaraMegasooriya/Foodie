@@ -6,12 +6,12 @@ const PostsHome = () => {
   const [posts, setPosts] = useState([]);
   const [error, setError] = useState('');
 
+  // Fetching posts from the backend
   useEffect(() => {
     const fetchPosts = async () => {
       try {
         const response = await axios.get('http://localhost:8080/posts'); // Backend endpoint to fetch posts
         setPosts(response.data);
-        
       } catch (error) {
         setError('Error fetching posts. Please try again.');
         console.error(error);
@@ -20,6 +20,46 @@ const PostsHome = () => {
 
     fetchPosts();
   }, []);
+
+  // Like post function
+  const handleLike = async (postId, currentLikes) => {
+    try {
+      const response = await fetch(`http://localhost:8080/posts/${postId}/like`, {
+        method: 'POST',
+      });
+      if (response.ok) {
+        setPosts(prevPosts =>
+          prevPosts.map(post =>
+            post.id === postId ? { ...post, likes: currentLikes + 1 } : post
+          )
+        );
+      } else {
+        console.log('Error liking post');
+      }
+    } catch (error) {
+      console.log('Error:', error);
+    }
+  };
+
+  // Unlike post function
+  const handleUnlike = async (postId, currentLikes) => {
+    try {
+      const response = await fetch(`http://localhost:8080/posts/${postId}/unlike`, {
+        method: 'POST',
+      });
+      if (response.ok) {
+        setPosts(prevPosts =>
+          prevPosts.map(post =>
+            post.id === postId ? { ...post, likes: currentLikes - 1 } : post
+          )
+        );
+      } else {
+        console.log('Error unliking post');
+      }
+    } catch (error) {
+      console.log('Error:', error);
+    }
+  };
 
   return (
     <div className="container mt-5">
@@ -37,10 +77,17 @@ const PostsHome = () => {
                 {/* Post Header */}
                 <div className="card-header d-flex justify-content-between align-items-center">
                   <div className="d-flex align-items-center">
-                    <img src="/userimage.png" width="70" className="rounded-circle" alt="User Avatar" />
+                    <img
+                      src="/userimage.png"
+                      width="70"
+                      className="rounded-circle"
+                      alt="User Avatar"
+                    />
                     <span className="ms-2">User Name</span>
                   </div>
-                  <button className="btn btn-light" style={{ border: 'none' }}>...</button>
+                  <button className="btn btn-light" style={{ border: 'none' }}>
+                    ...
+                  </button>
                 </div>
 
                 {/* Post Image */}
@@ -49,34 +96,66 @@ const PostsHome = () => {
                 {/* Post Actions */}
                 <div className="card-body">
                   <div className="d-flex justify-content-between align-items-center">
-                    <div>
-                      <button className="btn btn-link p-0">
-                        <i className="bi bi-heart"></i> {post.likes} Likes
+                    <div className="d-flex gap-4">
+                      {/* Like/Unlike Button */}
+                      <button
+                        className="btn p-0"
+                        onClick={() =>
+                          post.likes > 0 && post.liked
+                            ? handleUnlike(post.id, post.likes)
+                            : handleLike(post.id, post.likes)
+                        }
+                      >
+                        <i className="bi bi-heart-fill" style={{ color: 'red' }}></i>
+                        <span className="ms-2">{post.likes}</span>
                       </button>
-                      <button className="btn btn-link p-0" data-bs-toggle="modal" data-bs-target={`#commentsModal${post.id}`}>
+
+                      {/* Comment Button */}
+                      <button
+                        className="btn p-0"
+                        data-bs-toggle="modal"
+                        data-bs-target={`#commentsModal${post.id}`}
+                      >
                         <i className="bi bi-chat-dots"></i> {post.comments.length} Comments
                       </button>
                     </div>
-                    <button className="btn btn-link p-0">
+                    <button className="btn p-0">
                       <i className="bi bi-bookmark"></i> Save
                     </button>
                   </div>
 
                   {/* Post Caption */}
-                  <p className="mt-2"><strong></strong> {post.caption}</p>
+                  <p className="mt-2">
+                    <strong></strong> {post.caption}
+                  </p>
 
                   {/* Modal for Comments */}
-                  <div className="modal fade" id={`commentsModal${post.id}`} tabIndex="-1" aria-labelledby={`commentsModalLabel${post.id}`} aria-hidden="true">
+                  <div
+                    className="modal fade"
+                    id={`commentsModal${post.id}`}
+                    tabIndex="-1"
+                    aria-labelledby={`commentsModalLabel${post.id}`}
+                    aria-hidden="true"
+                  >
                     <div className="modal-dialog">
                       <div className="modal-content">
                         <div className="modal-header">
-                          <h5 className="modal-title" id={`commentsModalLabel${post.id}`}>Comments</h5>
-                          <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          <h5 className="modal-title" id={`commentsModalLabel${post.id}`}>
+                            Comments
+                          </h5>
+                          <button
+                            type="button"
+                            className="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"
+                          ></button>
                         </div>
                         <div className="modal-body">
                           <ul className="list-group">
                             {post.comments.map((comment, index) => (
-                              <li key={index} className="list-group-item">{comment}</li>
+                              <li key={index} className="list-group-item">
+                                {comment}
+                              </li>
                             ))}
                           </ul>
                         </div>
