@@ -1,0 +1,29 @@
+/* Styling for the Post Form */
+.post-form-container {
+    background-color: #f8f9fa;  /* Light background color */
+    padding: 2rem;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 600px;
+    margin: auto;  /* Center the form */
+  }
+  
+  h2 {
+    text-align: center;
+    color: #333333;  /* Darker text for the heading */
+  }
+  
+  input.form-control {
+    border-radius: 8px;
+  }
+  
+  .btn-warning {
+    background-color: #F8C035; /* Custom color for the button */
+    border-color: #F8C035;
+  }
+  
+  .btn-warning:hover {
+    background-color: #f7b000;
+    border-color: #f7b000;
+  }
+  

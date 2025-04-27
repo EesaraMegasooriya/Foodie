@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import './PostForm.css';  // Import custom CSS for post form
 
 const PostForm = () => {
   const [caption, setCaption] = useState('');
@@ -29,8 +30,8 @@ const PostForm = () => {
   };
 
   return (
-    <div className="container mt-5">
-      <h2>Create Post</h2>
+    <div className="container mt-5 post-form-container">
+      <h2 className="mb-4 text-center">Create a New Post</h2>
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
           <label htmlFor="caption" className="form-label">Title</label>
@@ -44,7 +45,7 @@ const PostForm = () => {
           />
         </div>
 
-        <button type="submit" className="btn btn-primary">Upload Post</button>
+        <button type="submit" className="btn btn-warning btn-lg mt-4">Upload Post</button>
       </form>
     </div>
   );

@@ -6,6 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+import java.util.ArrayList;
+
 @RestController
 @RequestMapping("/posts")
 @CrossOrigin(origins = "http://localhost:5173") // React frontend port
@@ -13,17 +16,73 @@ public class PostController {
 
     @Autowired
     private PostRepository postRepository;
-
-    // Endpoint to upload a post
+    
+    // Upload (Create) a post
     @PostMapping("/upload")
     public ResponseEntity<?> uploadPost(@RequestBody Post post) {
-
         if (post.getCaption() == null || post.getCaption().trim().isEmpty()) {
             return ResponseEntity.badRequest().body("Caption is required!");
         }
 
-        postRepository.save(post);  // Save the post to the database
-
+        // Save the post to the database (initialize likes and comments if needed)
+        post.setLikes(0);  // Set default likes to 0
+        post.setComments(post.getComments() != null ? post.getComments() : new ArrayList<>());  // Initialize comments if null
+        
+        postRepository.save(post);
         return ResponseEntity.ok("Post uploaded successfully!");
+    }
+
+    // Like a post
+    @PostMapping("/{id}/like")
+    public ResponseEntity<?> likePost(@PathVariable Long id) {
+        Optional<Post> optionalPost = postRepository.findById(id);
+
+        if (!optionalPost.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Post post = optionalPost.get();
+        post.setLikes(post.getLikes() + 1); // Increment likes
+        postRepository.save(post);
+
+        return ResponseEntity.ok("Post liked!");
+    }
+
+    // Add a comment to a post
+    @PostMapping("/{id}/comment")
+    public ResponseEntity<?> addComment(@PathVariable Long id, @RequestBody String comment) {
+        if (comment == null || comment.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("Comment cannot be empty!");
+        }
+
+        Optional<Post> optionalPost = postRepository.findById(id);
+
+        if (!optionalPost.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Post post = optionalPost.get();
+        post.getComments().add(comment); // Add comment
+        postRepository.save(post);
+
+        return ResponseEntity.ok("Comment added!");
+    }
+
+    // Get all posts (optional: so frontend can fetch and show posts)
+    @GetMapping
+    public ResponseEntity<?> getAllPosts() {
+        return ResponseEntity.ok(postRepository.findAll());
+    }
+
+    // Get a specific post by id
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getPostById(@PathVariable Long id) {
+        Optional<Post> optionalPost = postRepository.findById(id);
+
+        if (!optionalPost.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(optionalPost.get());
     }
 }
