@@ -11,6 +11,7 @@ const PostsHome = () => {
       try {
         const response = await axios.get('http://localhost:8080/posts'); // Backend endpoint to fetch posts
         setPosts(response.data);
+        
       } catch (error) {
         setError('Error fetching posts. Please try again.');
         console.error(error);
@@ -36,14 +37,14 @@ const PostsHome = () => {
                 {/* Post Header */}
                 <div className="card-header d-flex justify-content-between align-items-center">
                   <div className="d-flex align-items-center">
-                    <img src="https://via.placeholder.com/40" className="rounded-circle" alt="User Avatar" />
+                    <img src="/userimage.png" width="70" className="rounded-circle" alt="User Avatar" />
                     <span className="ms-2">User Name</span>
                   </div>
                   <button className="btn btn-light" style={{ border: 'none' }}>...</button>
                 </div>
 
                 {/* Post Image */}
-                <img src={`http://localhost:8080/uploads/${post.image}`} className="card-img-top" alt={post.caption} />
+                <img src={`/image.png`} className="card-img-top" alt={post.caption} />
 
                 {/* Post Actions */}
                 <div className="card-body">
@@ -62,7 +63,7 @@ const PostsHome = () => {
                   </div>
 
                   {/* Post Caption */}
-                  <p className="mt-2"><strong>User Name:</strong> {post.caption}</p>
+                  <p className="mt-2"><strong></strong> {post.caption}</p>
 
                   {/* Modal for Comments */}
                   <div className="modal fade" id={`commentsModal${post.id}`} tabIndex="-1" aria-labelledby={`commentsModalLabel${post.id}`} aria-hidden="true">

@@ -18,7 +18,7 @@ public class PostController {
 
     @Autowired
     private PostRepository postRepository;
-    
+
     // Upload (Create) a post
     @PostMapping("/upload")
     public ResponseEntity<?> uploadPost(@RequestBody Post post) {
@@ -27,9 +27,10 @@ public class PostController {
         }
 
         // Save the post to the database (initialize likes and comments if needed)
-        post.setLikes(0);  // Set default likes to 0
-        post.setComments(post.getComments() != null ? post.getComments() : new ArrayList<>());  // Initialize comments if null
-        
+        post.setLikes(0); // Set default likes to 0
+        post.setComments(post.getComments() != null ? post.getComments() : new ArrayList<>()); // Initialize comments if
+                                                                                               // null
+
         postRepository.save(post);
         return ResponseEntity.ok("Post uploaded successfully!");
     }
@@ -92,14 +93,28 @@ public class PostController {
     @GetMapping("/{id}/comments")
     public ResponseEntity<?> getCommentsForPost(@PathVariable Long id) {
         Optional<Post> optionalPost = postRepository.findById(id);
-    
+
         if (!optionalPost.isPresent()) {
             return ResponseEntity.notFound().build(); // If post not found, return 404
         }
-    
+
         Post post = optionalPost.get();
         List<String> comments = post.getComments(); // Get the list of comments
-    
+
         return ResponseEntity.ok(comments); // Return comments in response
     }
+
+    // Delete a post by id
+    @DeleteMapping("/{id}/dd")
+    public ResponseEntity<?> deletePost(@PathVariable Long id) {
+        Optional<Post> optionalPost = postRepository.findById(id);
+
+        if (!optionalPost.isPresent()) {
+            return ResponseEntity.notFound().build(); // If post not found, return 404
+        }
+
+        postRepository.deleteById(id); // Delete the post
+        return ResponseEntity.ok("Post deleted successfully!");
+    }
+
 }
