@@ -1,0 +1,59 @@
+package com.example.foodapp.service;
+
+import com.example.foodapp.dto.JwtResponse;
+import com.example.foodapp.dto.LoginRequest;
+import com.example.foodapp.dto.RegisterRequest;
+import com.example.foodapp.model.User;
+import com.example.foodapp.repository.UserRepository;
+import com.example.foodapp.security.JwtUtil;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import com.example.foodapp.model.User;
+import com.example.foodapp.repository.UserRepository;
+
+@Service
+@RequiredArgsConstructor
+public class UserService {
+
+    private final JwtUtil jwtUtil;
+    private final UserRepository userRepository;
+
+    public JwtResponse register(RegisterRequest request) {
+        // For local registration
+        User user = new User();
+        user.setEmail(request.getEmail());
+        user.setName(request.getName());
+        user.setPassword(request.getPassword()); // ideally encode!
+        user.setRole("USER");
+        user.setProvider("local");
+        userRepository.save(user);
+
+        String token = jwtUtil.generateToken(user.getEmail(), user.getName());
+        return new JwtResponse(token, user.getName());
+    }
+
+    public JwtResponse login(LoginRequest request) {
+        // Simple check (replace with real auth in future)
+        User user = userRepository.findByEmail(request.getEmail()).orElseThrow();
+        String token = jwtUtil.generateToken(user.getEmail(), user.getName());
+        return new JwtResponse(token, user.getName());
+    }
+
+    public JwtResponse processGoogleUser(String email, String name) {
+        User user = userRepository.findByEmail(email).orElse(null);
+
+        if (user == null) {
+            user = new User();
+            user.setEmail(email);
+            user.setName(name);
+            user.setProvider("google");
+            user.setRole("USER");
+            userRepository.save(user);
+        }
+
+        String token = jwtUtil.generateToken(email, name);
+        return new JwtResponse(token, name);
+    }
+}
