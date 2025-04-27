@@ -1,58 +1,23 @@
-
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import './App.css'
-
+import './App.css';
 import Header from './components/Header';
 import Footer from './components/Footer';
-import Home from './components/Home'; 
-
-//Events
-import EventHome from './components/Events/EventHome';
-import BrowseEvents from './components/Events/BrowseEvents';
-import CreateEvent from './components/Events/CreateEvent';
-import EventSingleView from './components/Events/EventSingleView';
-
-//Skills
-import SkillsHome from './components/Skills/SkillsHome';
-
-//Posts
-import PostsHome from './components/Posts/PostHome';
-
-//Recipes
-import RecipesHome from './components/Recipies/RecipieHome';
-
-
-
-
-
+import Home from './components/Home';
+import PostForm from './components/Posts/PostForm';
+import PostHome from './components/Posts/PostHome';
 
 function App() {
-  
-
   return (
     <BrowserRouter>
       <Header />
       <Routes>
-        <Route path="/" element={<Home/>} />
-        <Route path="/events" element={<EventHome />} />
-        <Route path="/events/browse" element={<BrowseEvents />} />
-        <Route path="/events/create" element={<CreateEvent />} />
-        <Route path="/events/:id" element={<EventSingleView />} />
-
-        {/* Add more routes as needed */}
-
-
-        <Route path="/skills" element={<SkillsHome />} />
-
-        <Route path="/posts" element={<PostsHome />} />
-
-        <Route path="/recipes" element={<RecipesHome />} />
-        
-
+        <Route path="/" element={<Home />} />
+        <Route path="/posts" element={<PostHome />} />
+        <Route path="/posts/create" element={<PostForm />} />
       </Routes>
       <Footer />
     </BrowserRouter>
-  )
+  );
 }
 
-export default App
+export default App;

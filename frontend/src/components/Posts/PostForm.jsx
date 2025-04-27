@@ -1,53 +1,52 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
-const PostForm = ({ onPostCreated }) => {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
+const PostForm = () => {
+  const [caption, setCaption] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const newPost = {
-      title,
-      description,
-      userId: 1 // temporary placeholder, replace with real user ID if available
-    };
+    // Create an object with caption only
+    const postData = { caption };
 
     try {
-      await axios.post('http://localhost:8080/api/posts', newPost);
-      setTitle('');
-      setDescription('');
-      onPostCreated(); // to refresh post list if needed
+      // Send POST request to backend
+      await axios.post('http://localhost:8080/posts/upload', postData, {
+        headers: {
+          'Content-Type': 'application/json', // Ensure we send JSON
+        },
+      });
+
+      alert('Post created successfully!');
+      navigate('/posts');  // Redirect to posts page after success
     } catch (error) {
-      console.error('Error creating post:', error);
+      console.error(error);
+      alert('Error submitting the post. Please try again.');
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mb-4">
-      <h3>Create New Post</h3>
-      <div className="form-group mb-2">
-        <input
-          type="text"
-          className="form-control"
-          placeholder="Post title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          required
-        />
-      </div>
-      <div className="form-group mb-2">
-        <textarea
-          className="form-control"
-          placeholder="Description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          required
-        />
-      </div>
-      <button type="submit" className="btn btn-primary">Post</button>
-    </form>
+    <div className="container mt-5">
+      <h2>Create Post</h2>
+      <form onSubmit={handleSubmit}>
+        <div className="mb-3">
+          <label htmlFor="caption" className="form-label">Title</label>
+          <input
+            type="text"
+            id="caption"
+            className="form-control"
+            value={caption}
+            onChange={(e) => setCaption(e.target.value)}
+            required
+          />
+        </div>
+
+        <button type="submit" className="btn btn-primary">Upload Post</button>
+      </form>
+    </div>
   );
 };
 

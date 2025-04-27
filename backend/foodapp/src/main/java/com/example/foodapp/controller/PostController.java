@@ -1,39 +1,29 @@
 package com.example.foodapp.controller;
 
-import com.example.foodapp.model.*;
-import com.example.foodapp.service.PostService;
-import lombok.RequiredArgsConstructor;
+import com.example.foodapp.model.Post;
+import com.example.foodapp.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
-@RequiredArgsConstructor
-@RequestMapping("/api/posts")
-@CrossOrigin(origins = "*") // Allow frontend to connect
+@RequestMapping("/posts")
+@CrossOrigin(origins = "http://localhost:5173") // React frontend port
 public class PostController {
 
     @Autowired
-    private final PostService postService;
+    private PostRepository postRepository;
 
-    @GetMapping
-    public List<Post> getAllPosts() {
-        return postService.getAllPosts();
-    }
+    // Endpoint to upload a post
+    @PostMapping("/upload")
+    public ResponseEntity<?> uploadPost(@RequestBody Post post) {
 
-    @PostMapping
-    public Post createPost(@RequestBody Post post, @RequestBody List<Media> mediaList) {
-        return postService.createPost(post, mediaList);
-    }
+        if (post.getCaption() == null || post.getCaption().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("Caption is required!");
+        }
 
-    @PostMapping("/{postId}/comments")
-    public Comment addComment(@PathVariable Long postId, @RequestBody Comment comment) {
-        return postService.addComment(postId, comment);
-    }
+        postRepository.save(post);  // Save the post to the database
 
-    @PostMapping("/{postId}/reactions")
-    public Reaction reactToPost(@PathVariable Long postId, @RequestParam Long userId, @RequestParam String type) {
-        return postService.reactToPost(postId, userId, type);
+        return ResponseEntity.ok("Post uploaded successfully!");
     }
 }
