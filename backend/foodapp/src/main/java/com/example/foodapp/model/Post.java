@@ -1,5 +1,6 @@
 package com.example.foodapp.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -21,6 +22,9 @@ public class Post {
 
     @ElementCollection
     private List<String> comments;
+
+     @Column(nullable = true)
+    private String fileName;
 
     // Constructor
     public Post() {

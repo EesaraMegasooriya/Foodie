@@ -22,8 +22,8 @@ const PostsHome = () => {
 
   return (
     <div className="container mt-5">
-      <h2>All Posts</h2>
-      
+      <h2 className="mb-4">All Posts</h2>
+
       {error && <div className="alert alert-danger">{error}</div>}
 
       <div className="row">
@@ -32,33 +32,54 @@ const PostsHome = () => {
         ) : (
           posts.map((post) => (
             <div key={post.id} className="col-md-4 mb-4">
-              <div className="card">
+              <div className="card border-0 shadow-sm rounded-3">
+                {/* Post Header */}
+                <div className="card-header d-flex justify-content-between align-items-center">
+                  <div className="d-flex align-items-center">
+                    <img src="https://via.placeholder.com/40" className="rounded-circle" alt="User Avatar" />
+                    <span className="ms-2">User Name</span>
+                  </div>
+                  <button className="btn btn-light" style={{ border: 'none' }}>...</button>
+                </div>
+
+                {/* Post Image */}
                 <img src={`http://localhost:8080/uploads/${post.image}`} className="card-img-top" alt={post.caption} />
+
+                {/* Post Actions */}
                 <div className="card-body">
-                  <h5 className="card-title">{post.caption}</h5>
-                  <div className="d-flex justify-content-between">
-                    <button className="btn btn-primary">Like {post.likes}</button>
-                    <button className="btn btn-secondary" data-bs-toggle="modal" data-bs-target={`#commentsModal${post.id}`}>
-                      Comments {post.comments.length}
+                  <div className="d-flex justify-content-between align-items-center">
+                    <div>
+                      <button className="btn btn-link p-0">
+                        <i className="bi bi-heart"></i> {post.likes} Likes
+                      </button>
+                      <button className="btn btn-link p-0" data-bs-toggle="modal" data-bs-target={`#commentsModal${post.id}`}>
+                        <i className="bi bi-chat-dots"></i> {post.comments.length} Comments
+                      </button>
+                    </div>
+                    <button className="btn btn-link p-0">
+                      <i className="bi bi-bookmark"></i> Save
                     </button>
                   </div>
-                </div>
-              </div>
 
-              {/* Comments Modal */}
-              <div className="modal fade" id={`commentsModal${post.id}`} tabIndex="-1" aria-labelledby={`commentsModalLabel${post.id}`} aria-hidden="true">
-                <div className="modal-dialog">
-                  <div className="modal-content">
-                    <div className="modal-header">
-                      <h5 className="modal-title" id={`commentsModalLabel${post.id}`}>Comments</h5>
-                      <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div className="modal-body">
-                      <ul className="list-group">
-                        {post.comments.map((comment, index) => (
-                          <li key={index} className="list-group-item">{comment}</li>
-                        ))}
-                      </ul>
+                  {/* Post Caption */}
+                  <p className="mt-2"><strong>User Name:</strong> {post.caption}</p>
+
+                  {/* Modal for Comments */}
+                  <div className="modal fade" id={`commentsModal${post.id}`} tabIndex="-1" aria-labelledby={`commentsModalLabel${post.id}`} aria-hidden="true">
+                    <div className="modal-dialog">
+                      <div className="modal-content">
+                        <div className="modal-header">
+                          <h5 className="modal-title" id={`commentsModalLabel${post.id}`}>Comments</h5>
+                          <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div className="modal-body">
+                          <ul className="list-group">
+                            {post.comments.map((comment, index) => (
+                              <li key={index} className="list-group-item">{comment}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -68,6 +89,7 @@ const PostsHome = () => {
         )}
       </div>
 
+      {/* Create New Post Button */}
       <div className="text-center mt-4">
         <Link to="/posts/create">
           <button className="btn btn-warning">Create New Post</button>

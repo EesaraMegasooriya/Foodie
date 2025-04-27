@@ -1,46 +1,39 @@
 /* Custom styles for posts */
 .card {
-    border: none;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-  
-  .card-title {
-    font-size: 1.25rem;
-    font-weight: bold;
-  }
-  
-  .card-img-top {
-    object-fit: cover;
-    height: 200px; /* Ensure image height is consistent */
-  }
-  
-  /* Custom button styling for like and comment buttons */
-  .btn {
-    font-size: 0.875rem;
-    font-weight: bold;
-  }
-  
-  .btn-primary {
-    background-color: #F8C035; /* Custom color for like button */
-    border-color: #F8C035;
-  }
-  
-  .btn-primary:hover {
-    background-color: #f7b000;
-    border-color: #f7b000;
-  }
-  
-  .btn-secondary {
-    background-color: #6c757d; /* Bootstrap default color for comment button */
-    border-color: #6c757d;
-  }
-  
-  .btn-secondary:hover {
-    background-color: #5a6268;
-    border-color: #545b62;
-  }
-  
-  .mt-4 {
-    margin-top: 2rem;
-  }
-  
+  border: none;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card-img-top {
+  object-fit: cover;
+  height: 350px; /* Ensure image height is consistent */
+}
+
+.card-header {
+  background-color: #fff;
+  border-bottom: 1px solid #ddd;
+}
+
+.card-body {
+  padding: 0.5rem 1rem;
+}
+
+.card-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.btn-link {
+  font-size: 0.875rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.btn-link:hover {
+  color: #007bff;
+}
+
+/* Modal styling */
+.modal-content {
+  border-radius: 0.5rem;
+}

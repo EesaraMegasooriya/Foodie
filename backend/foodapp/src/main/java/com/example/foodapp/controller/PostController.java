@@ -2,6 +2,8 @@ package com.example.foodapp.controller;
 
 import com.example.foodapp.model.Post;
 import com.example.foodapp.repository.PostRepository;
+
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -84,5 +86,20 @@ public class PostController {
         }
 
         return ResponseEntity.ok(optionalPost.get());
+    }
+
+    // Get comments for a specific post
+    @GetMapping("/{id}/comments")
+    public ResponseEntity<?> getCommentsForPost(@PathVariable Long id) {
+        Optional<Post> optionalPost = postRepository.findById(id);
+    
+        if (!optionalPost.isPresent()) {
+            return ResponseEntity.notFound().build(); // If post not found, return 404
+        }
+    
+        Post post = optionalPost.get();
+        List<String> comments = post.getComments(); // Get the list of comments
+    
+        return ResponseEntity.ok(comments); // Return comments in response
     }
 }
