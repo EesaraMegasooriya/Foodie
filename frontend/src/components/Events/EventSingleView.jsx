@@ -25,7 +25,7 @@ const [editingContent, setEditingContent] = useState('');
       .catch(err => console.error("Error fetching event:", err));
   }, [id]);
 
-  if (!event) return <div className="p-4">Loading event details...</div>;
+  
 
   const handleShare = () => {
     const fullUrl = `${window.location.origin}${location.pathname}`;
@@ -60,20 +60,44 @@ const [editingContent, setEditingContent] = useState('');
     }
   }, [id]);
 
+  if (!event) return <div className="p-4">Loading event details...</div>;
+
   const handlePostComment = () => {
     if (!newComment.trim()) return;
   
+    const token = localStorage.getItem("jwt_token");
+    const user = JSON.parse(localStorage.getItem("user"));
+  
+    if (!token || !user) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Login Required',
+        text: 'Please log in to post a comment',
+      });
+      return;
+    }
+  
     axios.post(`http://localhost:8080/api/events/${id}/comments`, {
-      content: newComment
+      content: newComment,
+      userId: user.id,
+      username: user.username
     }, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("jwt_token")}` }
+      headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => {
         setComments([...comments, res.data]);
         setNewComment('');
       })
-      .catch(err => console.error("Failed to post comment:", err));
+      .catch(err => {
+        console.error("Failed to post comment:", err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Comment Failed',
+          text: 'Something went wrong while posting your comment.',
+        });
+      });
   };
+  
 
   
   const handleDeleteComment = (commentId) => {
