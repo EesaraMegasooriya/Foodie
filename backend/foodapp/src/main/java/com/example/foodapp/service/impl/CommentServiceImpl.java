@@ -29,10 +29,17 @@ public class CommentServiceImpl implements CommentService {
     public Comment addComment(Long eventId, Comment comment) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new ResourceNotFoundException("Event not found with ID: " + eventId));
-
-        comment.setEvent(event);
-        return commentRepository.save(comment);
+    
+        Comment newComment = new Comment();
+        newComment.setContent(comment.getContent());
+        newComment.setUserId(comment.getUserId());
+        newComment.setUsername(comment.getUsername());  // <-- Set explicitly
+        newComment.setEvent(event);
+    
+        return commentRepository.save(newComment);
     }
+    
+
 
     @Override
     public Comment updateComment(Long commentId, Comment updatedComment, Long currentUserId) {

@@ -7,11 +7,7 @@ import com.example.foodapp.model.User;
 import com.example.foodapp.repository.UserRepository;
 import com.example.foodapp.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import com.example.foodapp.model.User;
-import com.example.foodapp.repository.UserRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -21,24 +17,26 @@ public class UserService {
     private final UserRepository userRepository;
 
     public JwtResponse register(RegisterRequest request) {
-        // For local registration
         User user = new User();
         user.setEmail(request.getEmail());
         user.setName(request.getName());
-        user.setPassword(request.getPassword()); // ideally encode!
+        user.setPassword(request.getPassword()); // Consider using PasswordEncoder here
         user.setRole("USER");
         user.setProvider("local");
+
         userRepository.save(user);
 
         String token = jwtUtil.generateToken(user.getEmail(), user.getName());
-        return new JwtResponse(token, user.getName());
+        user.setPassword(null); // Hide password in response
+        return new JwtResponse(token, user);
     }
 
     public JwtResponse login(LoginRequest request) {
-        // Simple check (replace with real auth in future)
         User user = userRepository.findByEmail(request.getEmail()).orElseThrow();
+
         String token = jwtUtil.generateToken(user.getEmail(), user.getName());
-        return new JwtResponse(token, user.getName());
+        user.setPassword(null); // Hide password in response
+        return new JwtResponse(token, user);
     }
 
     public JwtResponse processGoogleUser(String email, String name) {
@@ -53,7 +51,8 @@ public class UserService {
             userRepository.save(user);
         }
 
-        String token = jwtUtil.generateToken(email, name);
-        return new JwtResponse(token, name);
+        String token = jwtUtil.generateToken(user.getEmail(), user.getName());
+        user.setPassword(null); // Hide password in response
+        return new JwtResponse(token, user);
     }
 }
