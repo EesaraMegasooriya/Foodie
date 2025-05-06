@@ -2,10 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { Card, Button, Row, Col, Badge } from 'react-bootstrap';
-import { FaCalendarAlt, FaMapMarkerAlt, FaUsers, FaHeart, FaShareAlt } from 'react-icons/fa';
+import { FaCalendarAlt, FaMapMarkerAlt, FaUsers, FaHeart, FaShareAlt,FaExternalLinkAlt } from 'react-icons/fa';
 import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router-dom';
+
 
 function EventSingleView() {
+  const navigate = useNavigate();
+const [isRegistered, setIsRegistered] = useState(false);
+
 
   const { id } = useParams(); // Get :id from URL
   const [event, setEvent] = useState(null);
@@ -15,6 +20,10 @@ const [currentUserId, setCurrentUserId] = useState(null);
 const [editingCommentId, setEditingCommentId] = useState(null);
 const [editingContent, setEditingContent] = useState('');
 const [visibleComments, setVisibleComments] = useState(3);
+const [isRegistering, setIsRegistering] = useState(false);
+
+
+
 
 
 
@@ -61,6 +70,24 @@ const [visibleComments, setVisibleComments] = useState(3);
       setCurrentUserId(tokenUser.id); // or tokenUser._id
     }
   }, [id]);
+
+  // Place this outside all functions
+useEffect(() => {
+  const tokenUser = JSON.parse(localStorage.getItem("user"));
+  if (tokenUser) {
+    setCurrentUserId(tokenUser.id);
+  }
+
+  axios.get(`http://localhost:8080/api/events/${id}`)
+    .then(res => {
+      setEvent(res.data);
+      if (res.data.registeredUsers && tokenUser) {
+        setIsRegistered(res.data.registeredUsers.includes(tokenUser.id));
+      }
+    })
+    .catch(err => console.error("Error fetching event:", err));
+}, [id]);
+
 
   if (!event) return <div className="p-4">Loading event details...</div>;
 
@@ -204,6 +231,58 @@ const [visibleComments, setVisibleComments] = useState(3);
     setVisibleComments(prev => prev + 3); // Load 3 more at a time
   };
   
+
+
+  
+
+  
+  const handleRegister = async () => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    const token = localStorage.getItem("jwt");
+  
+    if (!user || !token) {
+      Swal.fire({ icon: 'warning', title: 'Login required to register' });
+      return;
+    }
+  
+    setIsRegistering(true); // start spinner
+  
+    try {
+      const res = await axios.put(
+        `http://localhost:8080/api/events/${id}/register?userId=${user.id}&email=${encodeURIComponent(user.email)}`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+  
+      setEvent(res.data);
+      setIsRegistered(true);
+    } catch (err) {
+      console.error("Registration failed", err);
+      Swal.fire({
+        icon: 'error',
+        title: 'Could not register',
+        text: err.response?.data?.message || 'Unexpected error occurred.',
+      });
+    } finally {
+      setIsRegistering(false); // stop spinner
+    }
+  };
+  
+  
+  
+  
+  const handleUnregister = async () => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    try {
+      const res = await axios.put(`http://localhost:8080/api/events/${id}/unregister?userId=${user.id}`);
+      setEvent(res.data);
+      setIsRegistered(false);
+    } catch (err) {
+      console.error("Unregister failed", err);
+      Swal.fire({ icon: 'error', title: 'Could not unregister.' });
+    }
+  };
+  
   
   
 
@@ -228,15 +307,26 @@ const [visibleComments, setVisibleComments] = useState(3);
 
               <div>
                 <div className='d-flex py-2 align-items-center'>
-                  <FaCalendarAlt color='blue' className="me-2" />
+                  <FaCalendarAlt  className="me-2" />
                   <span>{event.eventDate} {event.eventTime}</span>
                 </div>
                 <div className='d-flex py-2 align-items-center'>
-                  <FaMapMarkerAlt color='blue' className="me-2" />
-                  <span>{event.location}</span>
-                </div>
+                      {event.type === 'Online' ? (
+                        <>
+                          <FaExternalLinkAlt className='me-2' />
+                          <a href={event.link} target="_blank" rel="noopener noreferrer">
+                            {event.link}
+                          </a>
+                        </>
+                      ) : (
+                        <>
+                          <FaMapMarkerAlt className='me-2' />
+                          <span>{event.location}</span>
+                        </>
+                      )}
+                    </div>
                 <div className='d-flex py-2 align-items-center'>
-                  <FaUsers color='blue' className="me-2" />
+                  <FaUsers className="me-2" />
                   <span>{event.maxParticipants} participants</span>
                 </div>
               </div>
@@ -333,11 +423,30 @@ const [visibleComments, setVisibleComments] = useState(3);
               <p className='text-color-blue' >$ {event.registrationFee}</p>
             </div>
             <div className=''>
-              <button className='btn btn-primary w-100'>Register</button>
-            </div>
-            <div className='mt-3 text-secondary'>
-             spots left
-            </div>
+  {isRegistered ? (
+    <button className='btn btn-outline-danger w-100' onClick={handleUnregister}>
+      Unregister
+    </button>
+  ) : (
+    <button
+  className='btn btn-primary w-100'
+  onClick={handleRegister}
+  disabled={event.registeredUsers.length >= event.maxParticipants || isRegistering}
+>
+  {event.registeredUsers.length >= event.maxParticipants
+    ? "Event Full"
+    : isRegistering
+      ? <span className="spinner-border spinner-border-sm me-2" role="status" />
+      : "Register"}
+</button>
+
+  )}
+</div>
+
+<div className='mt-3 text-secondary'>
+  {event.maxParticipants - event.registeredUsers.length} spots left
+</div>
+
             </div>
 
             <div className='mt-5 p-2 bg-white rounded'>
