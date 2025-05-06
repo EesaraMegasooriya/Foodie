@@ -1,24 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Container, Form, Button, Row, Col, Card, Alert, Spinner } from "react-bootstrap";
-import { BsUpload, BsPlusCircle, BsTrash } from "react-icons/bs";
+import { BsUpload, BsPlusCircle, BsTrash, BsSave } from "react-icons/bs";
 import axios from 'axios';
-import { useParams, useNavigate } from "react-router-dom"; // assumes you're using React Router
+import { useParams, useNavigate } from "react-router-dom";
 
-
-
-const AddLesson = () => {
-
-
-  const { courseId } = useParams(); // from route like /edit/:courseId
+const CourseUpdate = () => {
+  const { courseId } = useParams();
   const navigate = useNavigate();
-  
-  const isEditMode = Boolean(courseId);
   
   // Main form state
   const [formData, setFormData] = useState({
     title: "",
     chefName: "",
-    date: new Date().toISOString().split('T')[0], // Initialize with today's date
+    date: new Date().toISOString().split('T')[0],
     description: "",
     level: "beginner",
     category: "",
@@ -27,17 +21,66 @@ const AddLesson = () => {
     duration: "",
   });
 
-  // Lessons state - dynamic array of lessons
+  // Lessons state
   const [lessons, setLessons] = useState([
     { lessonHeading: "", lessonContent: "", description: "", url: "", type: "", duration: "" }
   ]);
 
   // Image state
   const [imagePreview, setImagePreview] = useState(null);
+  const [currentImageUrl, setCurrentImageUrl] = useState("");
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(true);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
+
+  // Fetch course data on component mount
+  useEffect(() => {
+    const fetchCourseData = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8081/api/courses/${courseId}`, {
+          withCredentials: true
+        });
+        
+        const course = response.data;
+        
+        // Set main form data
+        setFormData({
+          title: course.title,
+          chefName: course.chefName,
+          date: course.date.split('T')[0],
+          description: course.description,
+          level: course.level,
+          category: course.category,
+          cuisine: course.cuisine,
+          ageRecommendation: course.ageRecommendation || "",
+          duration: course.duration,
+        });
+        
+        // Set lessons
+        if (course.lessons && course.lessons.length > 0) {
+          setLessons(course.lessons);
+        }
+        
+        // Set current image URL if exists
+        if (course.imageUrl) {
+          setCurrentImageUrl(`http://localhost:8081${course.imageUrl}`);
+          setImagePreview(`http://localhost:8081${course.imageUrl}`);
+        }
+        
+        setFetching(false);
+      } catch (err) {
+        console.error("Error fetching course:", err);
+        setError("Failed to load course data. Please try again later.");
+        setFetching(false);
+      }
+    };
+    
+    if (courseId) {
+      fetchCourseData();
+    }
+  }, [courseId]);
 
   // Handle main form changes
   const handleChange = (e) => {
@@ -69,12 +112,11 @@ const AddLesson = () => {
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Validate image type and size
       if (!file.type.match('image.*')) {
         setError('Please select an image file (JPEG, PNG, etc.)');
         return;
       }
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+      if (file.size > 5 * 1024 * 1024) {
         setError('Image size should be less than 5MB');
         return;
       }
@@ -96,10 +138,6 @@ const AddLesson = () => {
     }
     if (!formData.date) {
       setError('Publication date is required');
-      return false;
-    }
-    if (!image) {
-      setError('Course banner image is required');
       return false;
     }
     if (!formData.description.trim()) {
@@ -148,115 +186,102 @@ const AddLesson = () => {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError(null);
-  
-  if (!validateForm()) {
-    return;
-  }
+    e.preventDefault();
+    setError(null);
+    
+    if (!validateForm()) {
+      return;
+    }
 
-  try {
-    setLoading(true);
-    
-    // Create FormData object
-    const formPayload = new FormData();
-    
-    // Add main course details
-    formPayload.append("title", formData.title);
-    formPayload.append("chefName", formData.chefName);
-    formPayload.append("date", new Date(formData.date).toISOString());
-    formPayload.append("description", formData.description);
-    formPayload.append("level", formData.level);
-    formPayload.append("category", formData.category);
-    formPayload.append("cuisine", formData.cuisine);
-    formPayload.append("ageRecommendation", formData.ageRecommendation || "");
-    formPayload.append("duration", formData.duration);
-    
-    // Add lessons as a JSON string
-    formPayload.append("lessons", JSON.stringify(lessons.map(lesson => ({
-      lessonHeading: lesson.lessonHeading,
-      lessonContent: lesson.lessonContent,
-      description: lesson.description,
-      url: lesson.url || "",
-      type: lesson.type,
-      duration: lesson.duration.toString() // Ensure string format
-    }))));
-    
-    // Add image file
-    if (image) {
-      formPayload.append("imageFile", image); // Make sure this matches your backend expectation
-    }
-    
-    // Debug: Log FormData contents
-    console.log("FormData contents:");
-    for (let [key, value] of formPayload.entries()) {
-      console.log(key, value);
-    }
-    
-    // Make the request
-    const response = await axios.post('http://localhost:8081/api/courses', formPayload, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      },
-      withCredentials: true
-    });
-    
-    if (response.status === 201) {
-      setSuccess(true);
-      // Reset form
-      setFormData({
-        title: "",
-        chefName: "",
-        date: new Date().toISOString().split('T')[0],
-        description: "",
-        level: "beginner",
-        category: "",
-        cuisine: "",
-        ageRecommendation: "",
-        duration: "",
-      });
-      setLessons([{ lessonHeading: "", lessonContent: "", description: "", url: "", type: "", duration: "" }]);
-      setImage(null);
-      setImagePreview(null);
+    try {
+      setLoading(true);
       
-      setTimeout(() => setSuccess(false), 5000);
-    }
-  } catch (err) {
-    console.error("Error details:", err);
-    
-    let errorMessage = "Failed to create course. Please try again.";
-    
-    if (err.response) {
-      // Server responded with error status
-      console.error("Server response:", err.response.data);
+      // Create FormData object
+      const formPayload = new FormData();
       
-      if (err.response.status === 400) {
-        // Handle validation errors
-        if (err.response.data.errors) {
-          errorMessage = "Validation errors: " + 
-            Object.entries(err.response.data.errors)
-              .map(([field, message]) => `${field}: ${message}`)
-              .join(", ");
-        } else if (err.response.data.message) {
-          errorMessage = err.response.data.message;
-        }
+      // Add main course details
+      formPayload.append("title", formData.title);
+      formPayload.append("chefName", formData.chefName);
+      formPayload.append("date", new Date(formData.date).toISOString());
+      formPayload.append("description", formData.description);
+      formPayload.append("level", formData.level);
+      formPayload.append("category", formData.category);
+      formPayload.append("cuisine", formData.cuisine);
+      formPayload.append("ageRecommendation", formData.ageRecommendation || "");
+      formPayload.append("duration", formData.duration);
+      
+      // Add lessons as a JSON string
+      formPayload.append("lessons", JSON.stringify(lessons.map(lesson => ({
+        lessonHeading: lesson.lessonHeading,
+        lessonContent: lesson.lessonContent,
+        description: lesson.description,
+        url: lesson.url || "",
+        type: lesson.type,
+        duration: lesson.duration.toString()
+      }))));
+      
+      // Add image file if a new one was selected
+      if (image) {
+        formPayload.append("imageFile", image);
       }
-    } else if (err.request) {
-      // Request was made but no response received
-      errorMessage = "No response from server. Please check your connection.";
+      
+      // Make the PUT request to update the course
+      const response = await axios.put(`http://localhost:8081/api/courses/${courseId}`, formPayload, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        },
+        withCredentials: true
+      });
+      
+      if (response.status === 200) {
+        setSuccess(true);
+        setTimeout(() => {
+          navigate(`/courses/${courseId}`); // Redirect to course view after successful update
+        }, 2000);
+      }
+    } catch (err) {
+      console.error("Error updating course:", err);
+      
+      let errorMessage = "Failed to update course. Please try again.";
+      
+      if (err.response) {
+        if (err.response.status === 400) {
+          if (err.response.data.errors) {
+            errorMessage = "Validation errors: " + 
+              Object.entries(err.response.data.errors)
+                .map(([field, message]) => `${field}: ${message}`)
+                .join(", ");
+          } else if (err.response.data.message) {
+            errorMessage = err.response.data.message;
+          }
+        } else if (err.response.status === 404) {
+          errorMessage = "Course not found. It may have been deleted.";
+        }
+      } else if (err.request) {
+        errorMessage = "No response from server. Please check your connection.";
+      }
+      
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
     }
-    
-    setError(errorMessage);
-  } finally {
-    setLoading(false);
+  };
+
+  if (fetching) {
+    return (
+      <Container className="d-flex justify-content-center align-items-center" style={{ height: "80vh" }}>
+        <Spinner animation="border" role="status" variant="warning">
+          <span className="visually-hidden">Loading...</span>
+        </Spinner>
+      </Container>
+    );
   }
-};
 
   return (
     <Container className="my-5">
       {success && (
         <Alert variant="success" className="mb-4" onClose={() => setSuccess(false)} dismissible>
-          Course successfully added to the platform!
+          Course successfully updated! Redirecting...
         </Alert>
       )}
       
@@ -268,7 +293,7 @@ const AddLesson = () => {
       
       <Card className="shadow-lg border-0">
         <Card.Header className="bg-warning text-dark">
-          <h2 className="text-center my-2">Create New Cooking Course</h2>
+          <h2 className="text-center my-2">Update Cooking Course</h2>
         </Card.Header>
         
         <Card.Body className="p-4">
@@ -328,7 +353,6 @@ const AddLesson = () => {
                           accept="image/*"
                           onChange={handleImageUpload}
                           className="form-control"
-                          required
                         />
                         <span className="input-group-text">
                           <BsUpload />
@@ -342,6 +366,9 @@ const AddLesson = () => {
                             className="img-thumbnail"
                             style={{ height: "150px", objectFit: "cover" }}
                           />
+                          <p className="text-muted mt-1">
+                            {currentImageUrl && !image ? "Current image" : "New image selected"}
+                          </p>
                         </div>
                       )}
                       <Form.Text className="text-muted">
@@ -463,7 +490,7 @@ const AddLesson = () => {
                     <BsPlusCircle className="me-2" /> Add New Lesson
                   </Button>
                 </div>
-                <p className="text-muted mb-4">Create lessons for your course with detailed content and resources.</p>
+                <p className="text-muted mb-4">Update or modify lessons for your course.</p>
                 
                 {lessons.map((lesson, index) => (
                   <Card key={index} className="mb-4 border-light shadow-sm">
@@ -583,11 +610,11 @@ const AddLesson = () => {
                 {loading ? (
                   <>
                     <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
-                    <span className="ms-2">Publishing...</span>
+                    <span className="ms-2">Updating...</span>
                   </>
                 ) : (
                   <>
-                    <BsPlusCircle className="me-2" /> Publish Course
+                    <BsSave className="me-2" /> Update Course
                   </>
                 )}
               </Button>
@@ -599,4 +626,4 @@ const AddLesson = () => {
   );
 };
 
-export default AddLesson;
+export default CourseUpdate;

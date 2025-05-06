@@ -16,10 +16,12 @@ import EventSingleView from './components/Events/EventSingleView';
 import SkillsHome from './components/Skills/SkillsHome';
 import HomeSkillShare from './components/Skills/HomeSkillShare';
 import AddLesson from './components/Skills/AddLesson';
-import UpdateLesson from './components/Skills/UpdateLesson';
-import AdminLessonView from './components/Skills/AdminLessonView';
 import LessonListUser from './components/Skills/LessonListUser';
 import LessonDetail from './components/Skills/LessonDetail';
+import LessonView from './components/Skills/LessonView';
+import CourseUpdate from './components/Skills/CourseUpdate';
+import CourseDelete from './components/Skills/CourseDelete';
+import CourseAdd from './components/Skills/CourseAdd';
 
 
 // Posts
@@ -56,10 +58,14 @@ function App() {
             <Route path="skills/home" element={<HomeSkillShare />} />
             <Route path="skillshare" element={<HomeSkillShare />} /> {/* 👈 FIXED: added this */}
             <Route path="skills/add" element={<AddLesson />} />
-            <Route path="skills/update/:id" element={<UpdateLesson />} />
-            <Route path="skills/adminlist" element={<AdminLessonView />} />
             <Route path="skills/userlist" element={<LessonListUser />} />
-            <Route path="skills/lesson/:id" element={< LessonDetail/>} />
+            <Route path="skills/lesson/:id" element={<LessonDetail />} />
+            <Route path="/lesson/update/:id" element={<CourseUpdate />} />
+            <Route path="/lesson/delete/:id" element={<CourseDelete />} /> 
+            <Route path="/lessons" element={<LessonView />} />
+            <Route path="/lesson/ad" element={<CourseAdd />} />
+            
+
             
 
        
