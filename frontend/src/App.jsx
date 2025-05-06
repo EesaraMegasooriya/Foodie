@@ -12,13 +12,14 @@ import CreateEvent from './components/Events/CreateEvent';
 import EventSingleView from './components/Events/EventSingleView';
 
 // Skills
+// Skills (Skill Share)
 import SkillsHome from './components/Skills/SkillsHome';
-import HomeSkillShare from '../src/components/Skills/HomeSkillShare';
-import AddLesson from '../src/components/Skills/AddLesson';
-import UpdateLesson from '../src/components/Skills/UpdateLesson';
-import AdminLessonView from '../src/components/Skills/AdminLessonView';
-import LessonListUser from '../src/components/Skills/LessonListUser';
-import LessonDetails from '../src/components/Skills/LessonDetails';
+import HomeSkillShare from './components/Skills/HomeSkillShare';
+import AddLesson from './components/Skills/AddLesson';
+import UpdateLesson from './components/Skills/UpdateLesson';
+import AdminLessonView from './components/Skills/AdminLessonView';
+import LessonListUser from './components/Skills/LessonListUser';
+import LessonDetail from './components/Skills/LessonDetail';
 
 
 // Posts
@@ -50,16 +51,17 @@ function App() {
           <Route path="events/create" element={<CreateEvent />} />
           <Route path="events/:id" element={<EventSingleView />} />
 
-          {/* Skills */}
-          <Route path="skills" element={<SkillsHome />} />
-          <Route path="skillshare">
-            <Route index element={<HomeSkillShare />} />
-            <Route path="add" element={<AddLesson />} />
-            <Route path="update" element={<UpdateLesson />} />
-            <Route path="adminlist" element={<AdminLessonView />} />
-            <Route path="userlist" element={<LessonListUser />} />
-            <Route path="lesson/:id" element={<LessonDetails />} />
-          </Route>
+       {/* Skills */}
+            <Route path="skills" element={<SkillsHome />} />
+            <Route path="skills/home" element={<HomeSkillShare />} />
+            <Route path="skillshare" element={<HomeSkillShare />} /> {/* 👈 FIXED: added this */}
+            <Route path="skills/add" element={<AddLesson />} />
+            <Route path="skills/update/:id" element={<UpdateLesson />} />
+            <Route path="skills/adminlist" element={<AdminLessonView />} />
+            <Route path="skills/userlist" element={<LessonListUser />} />
+            <Route path="skills/lesson/:id" element={< LessonDetail/>} />
+            
+
        
 
           {/* Posts */}

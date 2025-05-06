@@ -16,7 +16,7 @@ function Header() {
 
         <Navbar.Collapse id="main-navbar">
           <Nav className="ms-auto">
-            <Nav.Link as={NavLink} to="/" exact>
+            <Nav.Link as={NavLink} to="/" end>
               Home
             </Nav.Link>
             <Nav.Link as={NavLink} to="/posts">
