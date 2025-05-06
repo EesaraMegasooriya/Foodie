@@ -1,5 +1,6 @@
 package com.example.foodapp.dto;
 
+import com.example.foodapp.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -7,5 +8,5 @@ import lombok.Data;
 @AllArgsConstructor
 public class JwtResponse {
     private String token;
-    private String name;
+    private User user;
 }

@@ -6,7 +6,12 @@ function Login() {
   const [form, setForm] = useState({ email: '', password: '' });
   const navigate = useNavigate();
   useEffect(() => {
-    const token = localStorage.getItem('jwt');
+    const token = localStorage.getItem('jwt_token');
+    const user = JSON.parse(localStorage.getItem("user"));
+const name = user?.name;
+
+
+
     if (token) {
       navigate('/'); //  Redirect to homepage if already logged in
     }
@@ -22,19 +27,21 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
       const res = await axios.post('http://localhost:8080/api/auth/login', form);
-      const { token, name } = res.data;
+      const { token, user } = res.data;
+localStorage.setItem('jwt_token', token);
+localStorage.setItem('user', JSON.stringify(user));
 
-      localStorage.setItem('jwt', token);
-      localStorage.setItem('name', name);
+  
       navigate('/');
     } catch (err) {
       console.error('Login failed:', err);
       alert('Invalid credentials');
     }
   };
+  
 
   return (
     <div className="container mt-5" style={{ maxWidth: '400px' }}>

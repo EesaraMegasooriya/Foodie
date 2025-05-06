@@ -14,6 +14,8 @@ const [newComment, setNewComment] = useState('');
 const [currentUserId, setCurrentUserId] = useState(null);
 const [editingCommentId, setEditingCommentId] = useState(null);
 const [editingContent, setEditingContent] = useState('');
+const [visibleComments, setVisibleComments] = useState(3);
+
 
 
 
@@ -62,10 +64,10 @@ const [editingContent, setEditingContent] = useState('');
 
   if (!event) return <div className="p-4">Loading event details...</div>;
 
-  const handlePostComment = () => {
+  const handlePostComment = async () => {
     if (!newComment.trim()) return;
   
-    const token = localStorage.getItem("jwt_token");
+    const token = localStorage.getItem("jwt");
     const user = JSON.parse(localStorage.getItem("user"));
   
     if (!token || !user) {
@@ -77,38 +79,85 @@ const [editingContent, setEditingContent] = useState('');
       return;
     }
   
-    axios.post(`http://localhost:8080/api/events/${id}/comments`, {
-      content: newComment,
-      userId: user.id,
-      username: user.username
-    }, {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then(res => {
-        setComments([...comments, res.data]);
-        setNewComment('');
-      })
-      .catch(err => {
-        console.error("Failed to post comment:", err);
-        Swal.fire({
-          icon: 'error',
-          title: 'Comment Failed',
-          text: 'Something went wrong while posting your comment.',
-        });
+    try {
+      await axios.post(`http://localhost:8080/api/events/${id}/comments`, {
+        content: newComment,
+        userId: user.id,
+        username: user.name
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
       });
+  
+      const res = await axios.get(`http://localhost:8080/api/events/${id}/comments`);
+      setComments(res.data);
+      setNewComment('');
+  
+      // Toast-style success alert
+      Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: 'success',
+        title: 'Comment posted successfully',
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true
+      });
+    } catch (err) {
+      console.error("Failed to post comment:", err);
+      Swal.fire({
+        icon: 'error',
+        title: 'Comment Failed',
+        text: 'Something went wrong while posting your comment.',
+      });
+    }
   };
+  
+  
   
 
   
   const handleDeleteComment = (commentId) => {
-    axios.delete(`http://localhost:8080/api/comments/${commentId}`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("jwt_token")}` }
-    })
-      .then(() => {
-        setComments(comments.filter(c => c.id !== commentId));
-      })
-      .catch(err => console.error("Failed to delete comment:", err));
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you really want to delete this comment?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const user = JSON.parse(localStorage.getItem("user"));
+  
+        axios.delete(`http://localhost:8080/api/comments/${commentId}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+            userId: user.id
+          }
+        })
+        .then(() => {
+          setComments(comments.filter(c => c.id !== commentId));
+          Swal.fire({
+            icon: 'success',
+            title: 'Deleted!',
+            text: 'Your comment has been deleted.',
+            timer: 1500,
+            showConfirmButton: false
+          });
+        })
+        .catch(err => {
+          console.error("Failed to delete comment:", err);
+          Swal.fire({
+            icon: 'error',
+            title: 'Delete Failed',
+            text: 'Could not delete the comment.',
+          });
+        });
+      }
+    });
   };
+  
+  
 
   const handleEditComment = (comment) => {
     setEditingCommentId(comment.id);
@@ -118,18 +167,43 @@ const [editingContent, setEditingContent] = useState('');
   const handleUpdateComment = () => {
     if (!editingContent.trim()) return;
   
+    const user = JSON.parse(localStorage.getItem("user"));
+  
     axios.put(`http://localhost:8080/api/comments/${editingCommentId}`, {
       content: editingContent
     }, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("jwt_token")}` }
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+        userId: user.id  
+      }
     })
       .then(res => {
         setComments(comments.map(c => c.id === editingCommentId ? res.data : c));
         setEditingCommentId(null);
         setEditingContent('');
+        Swal.fire({
+          icon: 'success',
+          title: 'Updated!',
+          text: 'Your comment has been updated.',
+          timer: 1500,
+          showConfirmButton: false
+        });
       })
-      .catch(err => console.error("Failed to update comment:", err));
+      .catch(err => {
+        console.error("Failed to update comment:", err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Update Failed',
+          text: 'Could not update the comment.',
+        });
+      });
   };
+  
+
+  const handleShowMore = () => {
+    setVisibleComments(prev => prev + 3); // Load 3 more at a time
+  };
+  
   
   
 
@@ -190,52 +264,61 @@ const [editingContent, setEditingContent] = useState('');
 
   {/* Existing Comments List */}
   <div className='mt-4'>
-    {comments.map(comment => (
-      <div key={comment.id} className="bg-light p-3 rounded mb-3">
-        <div className='d-flex justify-content-between align-items-start'>
-          <strong>{comment.username}</strong>
-          {currentUserId === comment.userId && (
-            <div>
-              {editingCommentId !== comment.id ? (
-                <>
-                  <button
-                    className='btn btn-sm btn-outline-secondary me-2'
-                    onClick={() => handleEditComment(comment)}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className='btn btn-sm btn-outline-danger'
-                    onClick={() => handleDeleteComment(comment.id)}
-                  >
-                    Delete
-                  </button>
-                </>
-              ) : null}
-            </div>
-          )}
-        </div>
-
-        {/* If in edit mode */}
-        {editingCommentId === comment.id ? (
-          <>
-            <textarea
-              className='form-control mt-2'
-              rows={2}
-              value={editingContent}
-              onChange={(e) => setEditingContent(e.target.value)}
-            />
-            <div className="mt-2 d-flex justify-content-end gap-2">
-              <button className='btn btn-sm btn-success' onClick={handleUpdateComment}>Save</button>
-              <button className='btn btn-sm btn-secondary' onClick={() => setEditingCommentId(null)}>Cancel</button>
-            </div>
-          </>
-        ) : (
-          <p className='mt-2'>{comment.content}</p>
+  {comments.slice(0, visibleComments).map(comment => (
+    <div key={comment.id} className="bg-light p-3 rounded mb-3">
+      <div className='d-flex justify-content-between align-items-start'>
+        <strong>{comment.username}</strong>
+        {currentUserId === comment.userId && (
+          <div>
+            {editingCommentId !== comment.id ? (
+              <>
+                <button
+                  className='btn btn-sm btn-outline-secondary me-2'
+                  onClick={() => handleEditComment(comment)}
+                >
+                  Edit
+                </button>
+                <button
+                  className='btn btn-sm btn-outline-danger'
+                  onClick={() => handleDeleteComment(comment.id)}
+                >
+                  Delete
+                </button>
+              </>
+            ) : null}
+          </div>
         )}
       </div>
-    ))}
-  </div>
+
+      {editingCommentId === comment.id ? (
+        <>
+          <textarea
+            className='form-control mt-2'
+            rows={2}
+            value={editingContent}
+            onChange={(e) => setEditingContent(e.target.value)}
+          />
+          <div className="mt-2 d-flex justify-content-end gap-2">
+            <button className='btn btn-sm btn-success' onClick={handleUpdateComment}>Save</button>
+            <button className='btn btn-sm btn-secondary' onClick={() => setEditingCommentId(null)}>Cancel</button>
+          </div>
+        </>
+      ) : (
+        <p className='mt-2'>{comment.content}</p>
+      )}
+    </div>
+  ))}
+
+  {/* Show More Button */}
+  {visibleComments < comments.length && (
+    <div className='d-flex justify-content-center mt-2'>
+      <button className='btn btn-sm btn-outline-primary' onClick={handleShowMore}>
+        Show More
+      </button>
+    </div>
+  )}
+</div>
+
 </div>
 
 

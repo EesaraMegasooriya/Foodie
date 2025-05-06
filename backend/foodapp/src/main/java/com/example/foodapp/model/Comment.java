@@ -1,6 +1,8 @@
 package com.example.foodapp.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -13,10 +15,12 @@ public class Comment {
     private String content;
 
     private Long userId;
+
     private String username;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id", nullable = false)
+    @JsonIgnore //  Prevents serialization issues from lazy-loading the Event entity
     private Event event;
 
     private LocalDateTime createdAt;

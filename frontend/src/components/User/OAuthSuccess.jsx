@@ -12,16 +12,16 @@ const OAuthSuccess = () => {
           withCredentials: true,
         });
 
-        const { token,name  } = response.data;
-        localStorage.setItem('jwt', token);
-        localStorage.setItem('name', name);
-        console.log('JWT stored:', token);
-        
+        const { token, user } = response.data;
 
-        // Redirect to home, events page, or dashboard
+        // Store both JWT and full user object
+        localStorage.setItem('jwt', token);
+        localStorage.setItem('user', JSON.stringify(user));
+        console.log('Logged in as:', user.name);
+
         navigate('/');
       } catch (error) {
-        console.error(' Failed to fetch JWT from backend:', error);
+        console.error('Failed to fetch JWT from backend:', error);
       }
     };
 
