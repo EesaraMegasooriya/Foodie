@@ -1,13 +1,10 @@
-
 package com.example.foodapp.controller;
 
 import com.example.foodapp.model.Event;
+import com.example.foodapp.service.EmailService;
 import com.example.foodapp.service.EventService;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,7 +19,7 @@ public class EventController {
     private EventService eventService;
 
     @Autowired
-    private JavaMailSender mailSender; // Inject JavaMailSender
+    private EmailService emailService; // Use the new EmailService class
 
     @GetMapping
     public List<Event> getAllEvents() {
@@ -54,12 +51,12 @@ public class EventController {
     public Event registerUser(
             @PathVariable Long id,
             @RequestParam Long userId,
-            @RequestParam String email // accept email from frontend
-    ) {
+            @RequestParam String email) {
+
         Event updatedEvent = eventService.registerUser(id, userId);
 
-        // After successful registration, send an email
-        sendRegistrationEmail(email, updatedEvent.getTitle(), updatedEvent.getEventDate().toString());
+        // Send confirmation email
+        emailService.sendRegistrationEmail(email, updatedEvent.getTitle(), updatedEvent.getEventDate().toString());
 
         return updatedEvent;
     }
@@ -69,21 +66,4 @@ public class EventController {
     public Event unregisterUser(@PathVariable Long id, @RequestParam Long userId) {
         return eventService.unregisterUser(id, userId);
     }
-
-    // Helper method to send email
-    private void sendRegistrationEmail(String toEmail, String eventTitle, String eventDate) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(toEmail);
-        message.setSubject("Event Registration Confirmation - " + eventTitle);
-        message.setText(
-            "Hello!\n\n" +
-            "You have successfully registered for the event:\n\n" +
-            "Event: " + eventTitle + "\n" +
-            "Date: " + eventDate + "\n\n" +
-            "We are excited to have you join!\n\n" +
-            "- FoodApp Team"
-        );
-        mailSender.send(message);
-    }
 }
-
