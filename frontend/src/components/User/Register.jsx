@@ -1,6 +1,6 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -10,15 +10,16 @@ function Register() {
   });
 
   const navigate = useNavigate();
+
   useEffect(() => {
     const token = localStorage.getItem('jwt');
     if (token) {
-      navigate('/'); //  Redirect to homepage if already logged in
+      navigate('/'); // Redirect if already logged in
     }
   }, [navigate]);
 
   const handleChange = (e) => {
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       [e.target.name]: e.target.value,
     }));
@@ -31,7 +32,7 @@ function Register() {
       const res = await axios.post('http://localhost:8080/api/auth/register', formData);
       alert('Registration successful!');
       console.log(res.data);
-      // Optional: redirect to login or dashboard
+      navigate('/login');
     } catch (error) {
       console.error('Registration error:', error);
       alert('Registration failed.');
@@ -43,65 +44,83 @@ function Register() {
   };
 
   return (
-    <div className="container mt-5">
-      <h2>Register</h2>
+    <div
+      style={{
+        backgroundImage: `url('/foodbg.jpg')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        minHeight: '100vh',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: '20px',
+      }}
+    >
+      <div
+        className="p-4 rounded shadow"
+        style={{
+          backgroundColor: 'rgba(255, 255, 255, 0.9)',
+          maxWidth: '450px',
+          width: '100%',
+        }}
+      >
+        <h2 className="text-center mb-4 text-dark">Create Account</h2>
 
-      {/* Email/Password Form */}
-      <form onSubmit={handleSubmit} className="mt-3">
-        <div className="mb-3">
-          <label>Name</label>
-          <input
-            type="text"
-            name="name"
-            className="form-control"
-            value={formData.name}
-            onChange={handleChange}
-            required
-          />
-        </div>
+        <form onSubmit={handleSubmit}>
+          <div className="mb-3">
+            <label>Name</label>
+            <input
+              type="text"
+              name="name"
+              className="form-control"
+              value={formData.name}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-        <div className="mb-3">
-          <label>Email</label>
-          <input
-            type="email"
-            name="email"
-            className="form-control"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
-        </div>
+          <div className="mb-3">
+            <label>Email</label>
+            <input
+              type="email"
+              name="email"
+              className="form-control"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-        <div className="mb-3">
-          <label>Password</label>
-          <input
-            type="password"
-            name="password"
-            className="form-control"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
-        </div>
+          <div className="mb-3">
+            <label>Password</label>
+            <input
+              type="password"
+              name="password"
+              className="form-control"
+              value={formData.password}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-        <button type="submit" className="btn btn-primary w-100">Register with Email</button>
-      </form>
+          <button type="submit" className="btn btn-dark w-100">
+            Register with Email
+          </button>
+        </form>
 
-      <hr className="my-4" />
+        <hr className="my-4" />
 
-      {/* Google Button */}
-      <div className="text-center">
-      <button
-  type="button"
-  onClick={handleGoogleAuth}
-  className="w-100 d-flex align-items-center justify-content-center gap-2 px-3 py-2 rounded border border-light bg-white text-dark fw-semibold"
-  style={{
-    fontSize: '14px',
-    transition: 'all 0.3s ease-in-out',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-  }}
->
-  <svg
+        <button
+          type="button"
+          onClick={handleGoogleAuth}
+          className="w-100 d-flex align-items-center justify-content-center gap-2 px-3 py-2 rounded border border-dark bg-white text-dark fw-semibold"
+          style={{
+            fontSize: '14px',
+            transition: 'all 0.3s ease-in-out',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+          }}
+        >
+          <svg
     viewBox="0 0 48 48"
     xmlns="http://www.w3.org/2000/svg"
     style={{ width: '20px', height: '20px' }}
@@ -129,9 +148,15 @@ function Register() {
       43.611,20.083z"
     />
   </svg>
-  Continue with Google
-</button>
+          Continue with Google
+        </button>
 
+        <div className="text-center mt-3">
+          <span>Already have an account? </span>
+          <Link to="/login" className="text-dark fw-semibold text-decoration-underline">
+            Login here
+          </Link>
+        </div>
       </div>
     </div>
   );
