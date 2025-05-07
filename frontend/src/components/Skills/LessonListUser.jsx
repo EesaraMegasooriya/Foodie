@@ -13,6 +13,11 @@ const LessonListUser = () => {
   const [filters, setFilters] = useState({ category: "", duration: "", level: "", cuisine: "" });
   const [viewMode, setViewMode] = useState("grid");
   const navigate = useNavigate();
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
+  const [likes, setLikes] = useState(0);
+  
+  const API_BASE_URL = 'http://localhost:8081';
 
   useEffect(() => {
     const fetchLessons = async () => {
@@ -48,6 +53,23 @@ const LessonListUser = () => {
     setFilteredLessons(results);
   }, [searchTerm, filters, lessons]);
 
+  const toggleFavorite = async () => {
+    try {
+      const response = await axios.patch(
+        `${API_BASE_URL}/api/courses/${id}/favorite`,
+        {},
+        { withCredentials: true }
+      );
+      
+      if (response.data) {
+        setIsFavorite(!isFavorite);
+      }
+    } catch (err) {
+      console.error("Error toggling favorite:", err);
+      setError("Failed to update favorite status");
+    }
+  };
+  
   const toggleLike = async () => {
     try {
       const response = await axios.patch(
@@ -244,24 +266,34 @@ const LessonListUser = () => {
                   <Card.Text className="flex-grow-1 small cursor-pointer" onClick={() => handleView(lesson._id)}>
                     {lesson.description?.length > 100 ? `${lesson.description.substring(0, 100)}...` : lesson.description}
                   </Card.Text>
-                  <Button variant="warning" size="sm" onClick={() => handleView(lesson.id)} className="mt-3">
-                    View Details 
+                  <div className="d-flex justify-content-between align-items-center mt-3">
+                  <Button variant="warning" size="sm" onClick={() => handleView(lesson.id)}>
+                    View Details
                   </Button>
-                  <Button 
-                    variant={isFavorite ? "danger" : "outline-danger"}
-                    onClick={toggleFavorite}
-                  >
-                    {isFavorite ? <FaHeart /> : <FaRegHeart />}
-                    <span className="ms-2">Favorite</span>
-                  </Button>
-                  
-                  <Button 
-                    variant={isLiked ? "primary" : "outline-primary"}
-                    onClick={toggleLike}
-                  >
-                    {isLiked ? <FaThumbsUp /> : <FaRegThumbsUp />}
-                    <span className="ms-2">{likes || 0}</span>
-                  </Button>
+                
+                  <div className="d-flex gap-2">
+                    <Button 
+                      variant={isFavorite ? "danger" : "outline-danger"} 
+                      onClick={toggleFavorite}
+                      size="sm"
+                      title="Favorite"
+                    >
+                      {isFavorite ? <FaHeart /> : <FaRegHeart />}
+                    </Button>
+                
+                    <Button 
+                      variant={isLiked ? "primary" : "outline-primary"} 
+                      onClick={toggleLike}
+                      size="sm"
+                      title="Like"
+                    >
+                      {isLiked ? <FaThumbsUp /> : <FaRegThumbsUp />}
+                      <span className="ms-1">{likes || 0}</span>
+                    </Button>
+                  </div>
+                </div>
+
+
                 </Card.Body>
               </Card>
             </Col>

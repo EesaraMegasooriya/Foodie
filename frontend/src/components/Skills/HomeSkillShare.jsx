@@ -32,7 +32,7 @@ const HomeSkillShare = () => {
   
 
   const handleLessonClick = () => {
-    navigate("/lessons");
+    navigate("/skills/userlist");
   };
 
   return (

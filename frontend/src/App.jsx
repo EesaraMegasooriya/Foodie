@@ -18,10 +18,8 @@ import HomeSkillShare from './components/Skills/HomeSkillShare';
 import AddLesson from './components/Skills/AddLesson';
 import LessonListUser from './components/Skills/LessonListUser';
 import LessonDetail from './components/Skills/LessonDetail';
-import LessonView from './components/Skills/LessonView';
 import CourseUpdate from './components/Skills/CourseUpdate';
 import CourseDelete from './components/Skills/CourseDelete';
-import CourseAdd from './components/Skills/CourseAdd';
 
 
 // Posts
@@ -62,8 +60,7 @@ function App() {
             <Route path="skills/lesson/:id" element={<LessonDetail />} />
             <Route path="/lesson/update/:id" element={<CourseUpdate />} />
             <Route path="/lesson/delete/:id" element={<CourseDelete />} /> 
-            <Route path="/lessons" element={<LessonView />} />
-            <Route path="/lesson/ad" element={<CourseAdd />} />
+           
             
 
             
