@@ -283,25 +283,69 @@ useEffect(() => {
     }
   };
   
+  const handleDeleteEvent = () => {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'This will permanently delete the event.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axios
+          .delete(`http://localhost:8080/api/events/${event.id}`, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+            },
+          })
+          .then(() => {
+            Swal.fire('Deleted!', 'The event has been deleted.', 'success');
+            navigate('/events/browse');
+          })
+          .catch((err) => {
+            console.error('Delete failed:', err);
+            Swal.fire('Failed!', 'Event could not be deleted.', 'error');
+          });
+      }
+    });
+  };
   
   
 
   return (
     
         
-    <div  className="mb-4">
+    <div style={{ backgroundColor: '#fff8e1', minHeight: '100vh' }} className="">
       <div className='p-2 d-flex justify-content-between'>
         <div className='p-5 w-75'>
           
               <div className='d-flex align-items-center justify-content-between'>
-                <Badge bg="primary" className="mb-2">{event.category}</Badge>
+                <Badge bg=""style={{
+        backgroundColor: '#f8c035',
+        color: 'black',
+        
+      }} className="mb-2">{event.category}</Badge>
                 <div className='d-flex gap-4 '>
                   <div>
-                    <FaHeart color="red" className="me-1" /> <span>{event.likes}</span>
+                    
                   </div>
-                  <div><Button variant="outline-secondary" onClick={handleShare}><FaShareAlt style={{ cursor: 'pointer' }} title="Share this event" /> Share This</Button></div>
+                  <div><Button
+  onClick={handleShare}
+  style={{
+    backgroundColor: '#f8c035',
+    color: 'black',
+    
+    border: 'none'
+  }}
+>
+  <FaShareAlt className="me-2" /> Share This
+</Button>
+</div>
                 </div>
               </div>
+              
               
               <h2 className='pb-2 mt-3 text-center fw-bold w-100'>{event.title}</h2>
 
@@ -330,8 +374,27 @@ useEffect(() => {
                   <span>{event.maxParticipants} participants</span>
                 </div>
               </div>
+              <div className="">
+              {event.userId === currentUserId && (
+  <div className="d-flex gap-2 justify-content-end mb-3">
+    <button
+      className="btn btn-outline-warning fw-semibold"
+      onClick={() => navigate(`/events/update/${event.id}`)}
+    >
+      Update Event
+    </button>
+    <button
+      className="btn btn-outline-danger fw-semibold"
+      onClick={handleDeleteEvent}
+    >
+      Delete Event
+    </button>
+  </div>
+)}
 
-              <div className='p-2 mt-4 bg-white rounded'>
+              </div>
+
+              <div className='p-4 mt-4 bg-white rounded'>
                 <h5 className='fw-bold'>About this Event</h5>
                 <p>{event.description}</p>
               </div>
@@ -341,7 +404,7 @@ useEffect(() => {
 
   {/* New Comment Input */}
   <textarea
-    className='w-100 border border-light rounded p-2'
+    className='w-100 border border-light rounded p-4'
     rows={3}
     placeholder='Write a comment...'
     value={newComment}
@@ -349,7 +412,14 @@ useEffect(() => {
   ></textarea>
 
   <div className='d-flex justify-content-end mt-3'>
-    <button className='btn btn-primary' onClick={handlePostComment}>Post Comment</button>
+  <button
+  className='btn fw-bold'
+  style={{ backgroundColor: '#f8c035', color: 'black', border: 'none' }}
+  onClick={handlePostComment}
+>
+  Post Comment
+</button>
+
   </div>
 
   {/* Existing Comments List */}
@@ -415,8 +485,9 @@ useEffect(() => {
 
             
         </div>
+        
           <div className='w-25 mt-5 p-3 d-flex flex-column'>
-            <div className='bg-white rounded p-2'>
+            <div className='bg-white rounded p-4'>
             <h4 className='fw-bold '>Registration</h4>
             <div className='d-flex justify-content-between fw-semibold mt-3'>
               <p>Registration Fee:</p>
@@ -424,24 +495,43 @@ useEffect(() => {
             </div>
             <div className=''>
   {isRegistered ? (
-    <button className='btn btn-outline-danger w-100' onClick={handleUnregister}>
+    <button
+      className='btn w-100 fw-bold'
+      onClick={handleUnregister}
+      style={{
+        border: '2px solid #f8c035',
+        color: '#f8c035',
+        backgroundColor: 'white'
+      }}
+    >
       Unregister
     </button>
   ) : (
     <button
-  className='btn btn-primary w-100'
-  onClick={handleRegister}
-  disabled={event.registeredUsers.length >= event.maxParticipants || isRegistering}
->
-  {event.registeredUsers.length >= event.maxParticipants
-    ? "Event Full"
-    : isRegistering
-      ? <span className="spinner-border spinner-border-sm me-2" role="status" />
-      : "Register"}
-</button>
-
+      className='btn w-100 fw-bold'
+      onClick={handleRegister}
+      disabled={event.registeredUsers.length >= event.maxParticipants || isRegistering}
+      style={{
+        backgroundColor: '#f8c035',
+        color: 'black',
+        fontWeight: 'bold',
+        border: 'none'
+      }}
+    >
+      {event.registeredUsers.length >= event.maxParticipants
+        ? "Event Full"
+        : isRegistering
+        ? (
+            <>
+              <span className="spinner-border spinner-border-sm me-2" role="status" />
+              Registering...
+            </>
+          )
+        : "Register"}
+    </button>
   )}
 </div>
+
 
 <div className='mt-3 text-secondary'>
   {event.maxParticipants - event.registeredUsers.length} spots left
@@ -449,7 +539,7 @@ useEffect(() => {
 
             </div>
 
-            <div className='mt-5 p-2 bg-white rounded'>
+            <div className='mt-5 p-4 bg-white rounded'>
               <div>
                 <h4 className='fw-bold'>Instructor</h4>
                 <div className='d-flex w-100 align-items-center gap-2'>

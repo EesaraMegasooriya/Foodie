@@ -1,19 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { AuthContext } from '../../context/AuthContext';
 
 function Login() {
   const [form, setForm] = useState({ email: '', password: '' });
   const navigate = useNavigate();
+  const { login } = useContext(AuthContext); //  get login function
+
   useEffect(() => {
     const token = localStorage.getItem('jwt_token');
-    const user = JSON.parse(localStorage.getItem("user"));
-const name = user?.name;
-
-
-
     if (token) {
-      navigate('/'); //  Redirect to homepage if already logged in
+      navigate('/');
     }
   }, [navigate]);
 
@@ -27,69 +25,86 @@ const name = user?.name;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
     try {
       const res = await axios.post('http://localhost:8080/api/auth/login', form);
       const { token, user } = res.data;
-localStorage.setItem('jwt_token', token);
-localStorage.setItem('user', JSON.stringify(user));
 
-  
+      localStorage.setItem('jwt_token', token);
+      login(user); //  triggers global update (context + Header)
+
       navigate('/');
     } catch (err) {
       console.error('Login failed:', err);
       alert('Invalid credentials');
     }
   };
-  
 
   return (
-    <div className="container mt-5" style={{ maxWidth: '400px' }}>
-      <h2 className="text-center mb-4">Login</h2>
+    <div
+      style={{
+        backgroundImage: `url('/foodbg.jpg')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        minHeight: '100vh',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
+      <div
+        className="p-4 rounded shadow"
+        style={{
+          backgroundColor: 'rgba(255, 255, 255, 0.9)',
+          maxWidth: '400px',
+          width: '100%',
+        }}
+      >
+        <h2 className="text-center mb-4 text-dark">Login</h2>
 
-      <form onSubmit={handleSubmit}>
-        <div className="mb-3">
-          <label>Email</label>
-          <input
-            type="email"
-            name="email"
-            className="form-control"
-            value={form.email}
-            onChange={handleChange}
-            required
-          />
-        </div>
+        <form onSubmit={handleSubmit}>
+          <div className="mb-3">
+            <label>Email</label>
+            <input
+              type="email"
+              name="email"
+              className="form-control"
+              value={form.email}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-        <div className="mb-3">
-          <label>Password</label>
-          <input
-            type="password"
-            name="password"
-            className="form-control"
-            value={form.password}
-            onChange={handleChange}
-            required
-          />
-        </div>
+          <div className="mb-3">
+            <label>Password</label>
+            <input
+              type="password"
+              name="password"
+              className="form-control"
+              value={form.password}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-        <button type="submit" className="btn btn-primary w-100">
-          Login with Email
-        </button>
-      </form>
+          <button type="submit" className="btn btn-dark w-100">
+            Login with Email
+          </button>
+        </form>
 
-      <hr className="my-4" />
+        <hr className="my-4" />
 
-      <button
-  type="button"
-  onClick={handleGoogleLogin}
-  className="w-100 d-flex align-items-center justify-content-center gap-2 px-3 py-2 rounded border border-light bg-white text-dark fw-semibold"
-  style={{
-    fontSize: '14px',
-    transition: 'all 0.3s ease-in-out',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-  }}
->
-  <svg
+        <button
+          type="button"
+          onClick={handleGoogleLogin}
+          className="w-100 d-flex align-items-center justify-content-center gap-2 px-3 py-2 rounded border border-dark bg-white text-dark fw-semibold"
+          style={{
+            fontSize: '14px',
+            transition: 'all 0.3s ease-in-out',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+          }}
+        >
+         
+          <svg
     viewBox="0 0 48 48"
     xmlns="http://www.w3.org/2000/svg"
     style={{ width: '20px', height: '20px' }}
@@ -117,11 +132,16 @@ localStorage.setItem('user', JSON.stringify(user));
       43.611,20.083z"
     />
   </svg>
-  Continue with Google
-</button>
+          Continue with Google
+        </button>
 
-
-      
+        <div className="text-center mt-3">
+          <span>Don't have an account? </span>
+          <Link to="/register" className="text-dark fw-semibold text-decoration-underline">
+            Register here
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }
