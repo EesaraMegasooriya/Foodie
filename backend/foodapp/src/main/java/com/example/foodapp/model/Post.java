@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,8 +24,8 @@ public class Post {
     @ElementCollection
     private List<String> comments;
 
-     @Column(nullable = true)
-    private String fileName;
+    @Column(nullable = true)
+    private String fileName;  // ✅ Add this field to store the uploaded file name
 
     // Constructor
     public Post() {
@@ -59,5 +60,13 @@ public class Post {
 
     public void setComments(List<String> comments) {
         this.comments = comments;
+    }
+
+    public String getFileName() {  // ✅ Getter for fileName
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {  // ✅ Setter for fileName
+        this.fileName = fileName;
     }
 }

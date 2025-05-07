@@ -17,25 +17,25 @@ public class PostService {
     private final CommentRepository commentRepository;
     private final ReactionRepository reactionRepository;
 
-    public List<Post> getAllPosts() {
-        return postRepository.findAll();
-    }
-
+    // Create a post with media (max 3)
     public Post createPost(Post post, List<Media> mediaList) {
-        if (mediaList.size() > 3) {
+        if (mediaList != null && mediaList.size() > 3) {
             throw new IllegalArgumentException("Max 3 media files allowed");
         }
 
         Post savedPost = postRepository.save(post);
 
-        for (Media media : mediaList) {
-            media.setPost(savedPost);
-            mediaRepository.save(media);
+        if (mediaList != null) {
+            for (Media media : mediaList) {
+                media.setPost(savedPost);
+                mediaRepository.save(media);
+            }
         }
 
         return savedPost;
     }
 
+    // Add a comment (max 10 per post)
     public Comment addComment(Long postId, Comment comment) {
         long count = commentRepository.countByPostId(postId);
         if (count >= 10) {
@@ -49,6 +49,7 @@ public class PostService {
         return commentRepository.save(comment);
     }
 
+    // React to a post (like/unlike)
     public Reaction reactToPost(Long postId, Long userId, String type) {
         Post post = postRepository.findById(postId).orElse(null);
         if (post == null) return null;
@@ -58,8 +59,18 @@ public class PostService {
 
         reaction.setPost(post);
         reaction.setUserId(userId);
-        reaction.setType(type);
+        reaction.setType(type); // should be "LIKE" or "UNLIKE"
 
         return reactionRepository.save(reaction);
+    }
+
+    // Get all posts
+    public List<Post> getAllPosts() {
+        return postRepository.findAll();
+    }
+
+    // Delete a post
+    public void deletePost(Long id) {
+        postRepository.deleteById(id);
     }
 }
