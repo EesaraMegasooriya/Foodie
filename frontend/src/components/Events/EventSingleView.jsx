@@ -283,6 +283,34 @@ useEffect(() => {
     }
   };
   
+  const handleDeleteEvent = () => {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'This will permanently delete the event.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axios
+          .delete(`http://localhost:8080/api/events/${event.id}`, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+            },
+          })
+          .then(() => {
+            Swal.fire('Deleted!', 'The event has been deleted.', 'success');
+            navigate('/events/browse');
+          })
+          .catch((err) => {
+            console.error('Delete failed:', err);
+            Swal.fire('Failed!', 'Event could not be deleted.', 'error');
+          });
+      }
+    });
+  };
   
   
 
@@ -345,6 +373,25 @@ useEffect(() => {
                   <FaUsers className="me-2" />
                   <span>{event.maxParticipants} participants</span>
                 </div>
+              </div>
+              <div className="">
+              {event.userId === currentUserId && (
+  <div className="d-flex gap-2 justify-content-end mb-3">
+    <button
+      className="btn btn-outline-warning fw-semibold"
+      onClick={() => navigate(`/events/update/${event.id}`)}
+    >
+      Update Event
+    </button>
+    <button
+      className="btn btn-outline-danger fw-semibold"
+      onClick={handleDeleteEvent}
+    >
+      Delete Event
+    </button>
+  </div>
+)}
+
               </div>
 
               <div className='p-4 mt-4 bg-white rounded'>
@@ -438,6 +485,7 @@ useEffect(() => {
 
             
         </div>
+        
           <div className='w-25 mt-5 p-3 d-flex flex-column'>
             <div className='bg-white rounded p-4'>
             <h4 className='fw-bold '>Registration</h4>

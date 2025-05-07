@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Container } from 'react-bootstrap';
 import Swal from 'sweetalert2';
@@ -16,8 +16,16 @@ function CreateEvent() {
     maxParticipants: '',
     instructorName: '',
     instructorBio: '',
-    userId: 1,
+    userId: null,
   });
+
+  // Set userId from localStorage on mount
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (user && user.id) {
+      setEventData((prev) => ({ ...prev, userId: user.id }));
+    }
+  }, []);
 
   const payload = {
     ...eventData,
@@ -41,43 +49,15 @@ function CreateEvent() {
     const {
       title, description, eventDate, eventTime, location, link,
       category, registrationFee, maxParticipants,
-      instructorName, instructorBio, type
+      instructorName, instructorBio, type, userId
     } = eventData;
 
     if (
       !title || !description || !eventDate || !eventTime ||
       !category || !registrationFee || !maxParticipants ||
-      !instructorName || !instructorBio || !type
+      !instructorName || !instructorBio || !type || !userId
     ) {
       return Swal.fire({ icon: 'warning', title: 'All fields are required!' });
-    }
-
-    if (type === 'Online' && (!link || link.trim() === '')) {
-      return Swal.fire({ icon: 'warning', title: 'Event link is required for online events.' });
-    }
-
-    if (type === 'Physical' && (!location || location.trim() === '')) {
-      return Swal.fire({ icon: 'warning', title: 'Event location is required for physical events.' });
-    }
-
-    if (title.length > 60) {
-      return Swal.fire({ icon: 'error', title: 'Title should be 60 characters or less.' });
-    }
-
-    if (description.length < 50) {
-      return Swal.fire({ icon: 'error', title: 'Description must be at least 50 characters.' });
-    }
-
-    if (instructorBio.length < 30) {
-      return Swal.fire({ icon: 'error', title: 'Bio must be at least 30 characters long.' });
-    }
-
-    if (isNaN(registrationFee)) {
-      return Swal.fire({ icon: 'error', title: 'Registration fee must be a number.' });
-    }
-
-    if (isNaN(maxParticipants)) {
-      return Swal.fire({ icon: 'error', title: 'Max participants must be a number.' });
     }
 
     try {
@@ -89,20 +69,14 @@ function CreateEvent() {
         showConfirmButton: false,
         timer: 1500,
       });
-
       setTimeout(() => navigate('/events/browse'), 1500);
-
-      setEventData({
-        title: '', description: '', eventDate: '', eventTime: '',
-        type: '', location: '', link: '', category: '',
-        registrationFee: '', maxParticipants: '',
-        instructorName: '', instructorBio: '', userId: 2,
-      });
     } catch (error) {
       console.error('Error creating event:', error);
-      if (error.response?.data) {
-        Swal.fire({ icon: 'error', title: 'Oops...', text: `Error: ${JSON.stringify(error.response.data)}` });
-      }
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: error.response?.data?.message || 'Failed to create event.',
+      });
     }
   };
 
