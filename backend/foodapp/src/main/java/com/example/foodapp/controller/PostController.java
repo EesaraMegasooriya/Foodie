@@ -24,6 +24,10 @@ public class PostController {
         this.postService = postService;
     }
 
+    public PostController(PostService postService) {
+        this.postService = postService;
+    }
+
     private static final String UPLOAD_DIR = "uploads/";
 
     @Autowired
