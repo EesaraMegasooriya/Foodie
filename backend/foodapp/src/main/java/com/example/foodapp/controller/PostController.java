@@ -20,18 +20,14 @@ import java.util.*;
 @CrossOrigin(origins = "http://localhost:5173")
 public class PostController {
 
-    public PostController(PostService postService) {
-        this.postService = postService;
-    }
-
-    public PostController(PostService postService) {
-        this.postService = postService;
-    }
-
     private static final String UPLOAD_DIR = "uploads/";
 
+    private final PostService postService;
+
     @Autowired
-    private PostService postService;
+    public PostController(PostService postService) {
+        this.postService = postService;
+    }
 
     @PostMapping("/upload")
     public ResponseEntity<?> uploadPost(
@@ -57,10 +53,12 @@ public class PostController {
                     Path filePath = Paths.get(UPLOAD_DIR + fileName);
                     Files.write(filePath, file.getBytes());
 
-                    public class Media {
-                        private String fileType;
-                        private String fileName;
-                    
+                    String fileType = file.getContentType().startsWith("video") ? "video" : "image";
+
+                    Media media = new Media();
+                    media.setFileName(fileName);
+                    media.setFileType(fileType);
+                    mediaList.add(media);
 
                 } catch (IOException e) {
                     return ResponseEntity.internalServerError().body("Error uploading file: " + file.getOriginalFilename());
@@ -72,6 +70,7 @@ public class PostController {
         post.setCaption(caption);
         post.setLikes(0);
         post.setComments(new ArrayList<>());
+        post.setMedia(mediaList);
 
         try {
             Post saved = postService.createPost(post, mediaList);
@@ -103,7 +102,6 @@ public class PostController {
 
         Comment comment = new Comment();
         comment.setContent(commentText);
-
 
         try {
             Comment saved = postService.addComment(id, comment);
@@ -148,9 +146,5 @@ public class PostController {
 
     public PostService getPostService() {
         return postService;
-    }
-
-    public void setPostService(PostService postService) {
-        this.postService = postService;
     }
 }
