@@ -1,43 +1,51 @@
+
 package com.example.foodapp.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Entity
-@Table(name = "events")
-@Data // Generates getters, setters, toString, equals, and hashCode
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
+
+
+
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder // Optional, for building Event objects easily
+@Builder
+@Entity
+@Table(name = "events")
 public class Event {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String title;
-
-    @Column(columnDefinition = "TEXT")
     private String description;
+    private LocalDate eventDate;
+    private LocalTime eventTime;
 
-    private String eventDate;
-    
-    private String likes;
-
-    private String eventTime;
-
-    private String location;
+    private String type;     // "Online" or "Physical"
+    private String link;     // Only if type == "Online"
+    private String location; // Only if type == "Physical"
 
     private String category;
-
-    private String registrationFee;
-
-    private String maxParticipants;
-
+    private Integer registrationFee;
+    private Integer maxParticipants;
     private String instructorName;
-
-    @Column(columnDefinition = "TEXT")
     private String instructorBio;
-
     private Long userId;
+
+    // New field to track registered user IDs
+    @ElementCollection
+    @CollectionTable(name = "event_registered_users", joinColumns = @JoinColumn(name = "event_id"))
+    @Column(name = "user_id")
+    private List<Long> registeredUsers = new ArrayList<>();
 }
+
+
