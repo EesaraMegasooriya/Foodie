@@ -24,9 +24,8 @@ public class RecipeService {
         recipe.setTitle(updatedRecipe.getTitle());
         recipe.setDescription(updatedRecipe.getDescription());
         recipe.setIngredients(updatedRecipe.getIngredients());
-        recipe.setPreparationSteps(updatedRecipe.getPreparationSteps());
+        recipe.setInstructions(updatedRecipe.getInstructions());
         recipe.setCookingTime(updatedRecipe.getCookingTime());
-        recipe.setTags(updatedRecipe.getTags());
 
         return recipeRepository.save(recipe);
     }
@@ -39,7 +38,4 @@ public class RecipeService {
         return recipeRepository.findAll();
     }
 
-    public List<Recipe> getRecipesByTag(String tag) {
-        return recipeRepository.findByTagsContaining(tag);
-    }
 }
