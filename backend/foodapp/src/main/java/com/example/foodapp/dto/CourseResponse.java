@@ -33,8 +33,8 @@ public class CourseResponse {
         this.imageUrl = course.getImageUrl();
         this.duration = course.getDuration();
         this.lessons = course.getLessons().stream()
-        .map(LessonResponse::new)
-        .collect(Collectors.toList());
+            .map(LessonResponse::new)
+                .collect(Collectors.toList());
     }
 
     public Long getId() {

@@ -13,6 +13,9 @@ public class CourseRequest {
     private String ageRecommendation;
     private List<LessonDto> lessons;
     private String duration;
+   
+    
+
     // Default constructor
     public CourseRequest() {
     }

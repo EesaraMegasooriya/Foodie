@@ -1,8 +1,9 @@
 package com.example.foodapp.repository;
-import com.example.foodapp.model.Course;
+
+import com.example.foodapp.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CourseRepository extends JpaRepository<Course, Long> {
+public interface UserRepository extends JpaRepository<User, Long> {
 }

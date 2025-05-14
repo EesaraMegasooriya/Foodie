@@ -18,6 +18,7 @@ const LessonListUser = () => {
   const [likes, setLikes] = useState(0);
   
   const API_BASE_URL = 'http://localhost:8081';
+  const currentUserId = "user123";
 
   useEffect(() => {
     const fetchLessons = async () => {
@@ -53,35 +54,44 @@ const LessonListUser = () => {
     setFilteredLessons(results);
   }, [searchTerm, filters, lessons]);
 
-  const toggleFavorite = async () => {
+  const toggleFavorite = async (lessonId) => {
+  try {
+    const response = await axios.post(
+      `/api/lessons/${lessonId}/favorite`, // Verify this endpoint
+      {},
+      {
+        headers: {
+          'Authorization': `Bearer ${user.token}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+    
+    // Handle successful response
+    setLessons(lessons.map(lesson => 
+      lesson._id === lessonId ? { ...lesson, isFavorite: !lesson.isFavorite } : lesson
+    ));
+  } catch (error) {
+    console.error('Error toggling favorite:', error);
+    // Add user feedback
+    alert('Failed to update favorite status. Please try again.');
+  }
+};
+  const toggleLike = async (courseId) => {
     try {
       const response = await axios.patch(
-        `${API_BASE_URL}/api/courses/${id}/favorite`,
+        `${API_BASE_URL}/api/courses/${courseId}/like`,
         {},
-        { withCredentials: true }
+        { 
+          withCredentials: true,
+          headers: {
+            'X-User-Id': currentUserId
+          }
+        }
       );
-      
-      if (response.data) {
-        setIsFavorite(!isFavorite);
-      }
-    } catch (err) {
-      console.error("Error toggling favorite:", err);
-      setError("Failed to update favorite status");
-    }
-  };
-  
-  const toggleLike = async () => {
-    try {
-      const response = await axios.patch(
-        `${API_BASE_URL}/api/courses/${id}/like`,
-        {},
-        { withCredentials: true }
-      );
-      
-      if (response.data) {
-        setIsLiked(!isLiked);
-        setLikes(isLiked ? likes - 1 : likes + 1);
-      }
+      setLessons(lessons.map(lesson => 
+        lesson.id === courseId ? response.data : lesson
+      ));
     } catch (err) {
       console.error("Error toggling like:", err);
       setError("Failed to update like status");
@@ -272,24 +282,24 @@ const LessonListUser = () => {
                   </Button>
                 
                   <div className="d-flex gap-2">
-                    <Button 
-                      variant={isFavorite ? "danger" : "outline-danger"} 
-                      onClick={toggleFavorite}
+                  <Button 
+                      variant={lesson.favorite ? "danger" : "outline-danger"} 
+                      onClick={() => toggleFavorite(lesson.id)}
                       size="sm"
                       title="Favorite"
                     >
-                      {isFavorite ? <FaHeart /> : <FaRegHeart />}
+                      {lesson.favorite ? <FaHeart /> : <FaRegHeart />}
                     </Button>
                 
                     <Button 
-                      variant={isLiked ? "primary" : "outline-primary"} 
-                      onClick={toggleLike}
-                      size="sm"
-                      title="Like"
-                    >
-                      {isLiked ? <FaThumbsUp /> : <FaRegThumbsUp />}
-                      <span className="ms-1">{likes || 0}</span>
-                    </Button>
+                    variant={lesson.liked ? "primary" : "outline-primary"} 
+                    onClick={() => toggleLike(lesson.id)}
+                    size="sm"
+                    title="Like"
+                  >
+                    {lesson.liked ? <FaThumbsUp /> : <FaRegThumbsUp />}
+                    <span className="ms-1">{lesson.likesCount || 0}</span>
+                  </Button>
                   </div>
                 </div>
 

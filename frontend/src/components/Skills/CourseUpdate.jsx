@@ -278,351 +278,367 @@ const CourseUpdate = () => {
   }
 
   return (
-    <Container className="my-5">
+    <>
       {success && (
-        <Alert variant="success" className="mb-4" onClose={() => setSuccess(false)} dismissible>
-          Course successfully updated! Redirecting...
-        </Alert>
-      )}
-      
-      {error && (
-        <Alert variant="danger" className="mb-4" onClose={() => setError(null)} dismissible>
-          {error}
-        </Alert>
-      )}
-      
-      <Card className="shadow-lg border-0">
-        <Card.Header className="bg-warning text-dark">
-          <h2 className="text-center my-2">Update Cooking Course</h2>
-        </Card.Header>
-        
-        <Card.Body className="p-4">
-          <Form onSubmit={handleSubmit}>
-            <Row>
-              {/* Course Details Section */}
-              <Col md={12}>
-                <h4 className="mb-3 text-warning">Course Information</h4>
-                <Row className="mb-4">
-                  <Col md={6}>
-                    <Form.Group className="mb-3">
-                      <Form.Label>Course Title</Form.Label>
-                      <Form.Control
-                        type="text"
-                        name="title"
-                        value={formData.title}
-                        onChange={handleChange}
-                        placeholder="E.g., Mastering Italian Cuisine"
-                        required
-                      />
-                    </Form.Group>
-                  </Col>
-                  
-                  <Col md={6}>
-                    <Form.Group className="mb-3">
-                      <Form.Label>Chef Name</Form.Label>
-                      <Form.Control
-                        type="text"
-                        name="chefName"
-                        value={formData.chefName}
-                        onChange={handleChange}
-                        placeholder="Your name or professional title"
-                        required
-                      />
-                    </Form.Group>
-                  </Col>
-
-                  <Col md={6}>
-                    <Form.Group className="mb-3">
-                      <Form.Label>Publication Date</Form.Label>
-                      <Form.Control
-                        type="date"
-                        name="date"
-                        value={formData.date}
-                        onChange={handleChange}
-                        required
-                      />
-                    </Form.Group>
-                  </Col>
-
-                  <Col md={6}>
-                    <Form.Group className="mb-3">
-                      <Form.Label>Course Banner Image</Form.Label>
-                      <div className="input-group">
-                        <Form.Control
-                          type="file"
-                          accept="image/*"
-                          onChange={handleImageUpload}
-                          className="form-control"
-                        />
-                        <span className="input-group-text">
-                          <BsUpload />
-                        </span>
-                      </div>
-                      {imagePreview && (
-                        <div className="mt-2 text-center">
-                          <img
-                            src={imagePreview}
-                            alt="Course preview"
-                            className="img-thumbnail"
-                            style={{ height: "150px", objectFit: "cover" }}
-                          />
-                          <p className="text-muted mt-1">
-                            {currentImageUrl && !image ? "Current image" : "New image selected"}
-                          </p>
-                        </div>
-                      )}
-                      <Form.Text className="text-muted">
-                        Recommended size: 1200x600px, max 5MB
-                      </Form.Text>
-                    </Form.Group>
-                  </Col>
-
-                  <Col md={6}>
-                    <Form.Group className="mb-3">
-                      <Form.Label>Difficulty Level</Form.Label>
-                      <Form.Select 
-                        name="level"
-                        value={formData.level}
-                        onChange={handleChange}
-                        required
-                      >
-                        <option value="beginner">Beginner</option>
-                        <option value="intermediate">Intermediate</option>
-                        <option value="advanced">Advanced</option>
-                        <option value="professional">Professional</option>
-                      </Form.Select>
-                    </Form.Group>
-                  </Col>
-
-                  <Col md={6}>
-                    <Form.Group className="mb-3">
-                      <Form.Label>Category</Form.Label>
-                      <Form.Select
-                        name="category"
-                        value={formData.category}
-                        onChange={handleChange}
-                        required
-                      >
-                        <option value="">Select a category</option>
-                        <option value="baking">Baking & Pastry</option>
-                        <option value="main-course">Main Courses</option>
-                        <option value="appetizers">Appetizers & Starters</option>
-                        <option value="desserts">Desserts</option>
-                        <option value="beverages">Beverages & Drinks</option>
-                        <option value="techniques">Cooking Techniques</option>
-                        <option value="healthy">Healthy Cooking</option>
-                        <option value="quick">Quick & Easy</option>
-                        <option value="vegetarian">Vegetarian & Vegan</option>
-                      </Form.Select>
-                    </Form.Group>
-                  </Col>
-
-                  <Col md={6}>
-                    <Form.Group className="mb-3">
-                      <Form.Label>Cuisine Type</Form.Label>
-                      <Form.Select
-                        name="cuisine"
-                        value={formData.cuisine}
-                        onChange={handleChange}
-                        required
-                      >
-                        <option value="">Select cuisine type</option>
-                        <option value="italian">Italian</option>
-                        <option value="french">French</option>
-                        <option value="indian">Indian</option>
-                        <option value="chinese">Chinese</option>
-                        <option value="japanese">Japanese</option>
-                        <option value="mexican">Mexican</option>
-                        <option value="mediterranean">Mediterranean</option>
-                        <option value="american">American</option>
-                        <option value="thai">Thai</option>
-                        <option value="middle-eastern">Middle Eastern</option>
-                        <option value="other">Other</option>
-                      </Form.Select>
-                    </Form.Group>
-                  </Col>
-
-                  <Col md={6}>
-                    <Form.Group className="mb-3">
-                      <Form.Label>Course Duration</Form.Label>
-                      <Form.Select
-                        name="duration"
-                        value={formData.duration}
-                        onChange={handleChange}
-                        required
-                      >
-                        <option value="">Select duration</option>
-                        <option value="under-1-hour">Under 1 hour</option>
-                        <option value="1-2-hours">1-2 hours</option>
-                        <option value="2-4-hours">2-4 hours</option>
-                        <option value="4-6-hours">4-6 hours</option>
-                        <option value="6-plus-hours">6+ hours</option>
-                      </Form.Select>
-                    </Form.Group>
-                  </Col>
-
-                  <Col md={12}>
-                    <Form.Group className="mb-3">
-                      <Form.Label>Course Description</Form.Label>
-                      <Form.Control
-                        as="textarea"
-                        rows={3}
-                        name="description"
-                        value={formData.description}
-                        onChange={handleChange}
-                        placeholder="Provide an overview of what students will learn in this course..."
-                        required
-                      />
-                    </Form.Group>
-                  </Col>
-                </Row>
-              </Col>
-
-              {/* Lessons Section */}
-              <Col md={12}>
-                <div className="d-flex justify-content-between align-items-center mb-3">
-                  <h4 className="text-warning mb-0">Course Lessons ({lessons.length})</h4>
-                  <Button 
-                    variant="outline-success" 
-                    onClick={addLesson}
-                    className="d-flex align-items-center"
-                  >
-                    <BsPlusCircle className="me-2" /> Add New Lesson
-                  </Button>
-                </div>
-                <p className="text-muted mb-4">Update or modify lessons for your course.</p>
-                
-                {lessons.map((lesson, index) => (
-                  <Card key={index} className="mb-4 border-light shadow-sm">
-                    <Card.Header className="bg-light d-flex justify-content-between align-items-center">
-                      <h5 className="mb-0">Lesson {index + 1}</h5>
-                      <Button 
-                        variant="outline-danger" 
-                        size="sm" 
-                        onClick={() => removeLesson(index)}
-                        disabled={lessons.length === 1}
-                        title={lessons.length === 1 ? "Course must have at least one lesson" : "Remove this lesson"}
-                      >
-                        <BsTrash />
-                      </Button>
-                    </Card.Header>
-                    <Card.Body>
-                      <Row>
-                        <Col md={12}>
-                          <Form.Group className="mb-3">
-                            <Form.Label>Lesson Title</Form.Label>
-                            <Form.Control
-                              type="text"
-                              value={lesson.lessonHeading}
-                              onChange={(e) => handleLessonChange(index, "lessonHeading", e.target.value)}
-                              placeholder={`E.g., Basic Knife Skills - Part ${index + 1}`}
-                              required
-                            />
-                          </Form.Group>
-                        </Col>
-                        
-                        <Col md={12}>
-                          <Form.Group className="mb-3">
-                            <Form.Label>Lesson Content</Form.Label>
-                            <Form.Control
-                              as="textarea"
-                              rows={3}
-                              value={lesson.lessonContent}
-                              onChange={(e) => handleLessonChange(index, "lessonContent", e.target.value)}
-                              placeholder="Detailed step-by-step instructions for this lesson..."
-                              required
-                            />
-                          </Form.Group>
-                        </Col>
-                        
-                        <Col md={6}>
-                          <Form.Group className="mb-3">
-                            <Form.Label>Short Description</Form.Label>
-                            <Form.Control
-                              type="text"
-                              value={lesson.description}
-                              onChange={(e) => handleLessonChange(index, "description", e.target.value)}
-                              placeholder="Brief overview of this lesson's content"
-                              required
-                            />
-                          </Form.Group>
-                        </Col>
-                        
-                        <Col md={6}>
-                          <Form.Group className="mb-3">
-                            <Form.Label>Resource URL</Form.Label>
-                            <Form.Control
-                              type="url"
-                              value={lesson.url}
-                              onChange={(e) => handleLessonChange(index, "url", e.target.value)}
-                              placeholder="Link to video or additional resources"
-                            />
-                          </Form.Group>
-                        </Col>
-                        
-                        <Col md={6}>
-                          <Form.Group className="mb-3">
-                            <Form.Label>Lesson Type</Form.Label>
-                            <Form.Select
-                              value={lesson.type || ""}
-                              onChange={(e) => handleLessonChange(index, "type", e.target.value)}
-                              required
-                            >
-                              <option value="">Select lesson type</option>
-                              <option value="video">Video Lesson</option>
-                              <option value="recipe">Recipe</option>
-                              <option value="technique">Technique Demonstration</option>
-                              <option value="theory">Culinary Theory</option>
-                              <option value="tips">Tips & Tricks</option>
-                            </Form.Select>
-                          </Form.Group>
-                        </Col>
-                        
-                        <Col md={6}>
-                          <Form.Group className="mb-3">
-                            <Form.Label>Estimated Time (minutes)</Form.Label>
-                            <Form.Control
-                              type="number"
-                              min="1"
-                              value={lesson.duration || ""}
-                              onChange={(e) => handleLessonChange(index, "duration", e.target.value)}
-                              placeholder="e.g., 15"
-                              required
-                            />
-                          </Form.Group>
-                        </Col>
-                      </Row>
-                    </Card.Body>
-                  </Card>
-                ))}
-              </Col>
-            </Row>
-
-            {/* Submit Button */}
-            <div className="d-grid gap-2 mt-4">
-              <Button 
-                type="submit" 
-                variant="warning" 
-                size="lg" 
-                className="fw-bold" 
-                disabled={loading}
-              >
-                {loading ? (
-                  <>
-                    <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
-                    <span className="ms-2">Updating...</span>
-                  </>
-                ) : (
-                  <>
-                    <BsSave className="me-2" /> Update Course
-                  </>
-                )}
-              </Button>
+        <Alert 
+          variant="success" 
+          className="position-fixed top-0 end-0 m-3 z-index-1050 min-width-300 shadow"
+        >
+          <div className="d-flex justify-content-between align-items-center">
+            <div>
+              <Alert.Heading>Success!</Alert.Heading>
+              <p>Course updated successfully.</p>
             </div>
-          </Form>
-        </Card.Body>
-      </Card>
-    </Container>
+          </div>
+        </Alert>
+      )}
+      
+      <Container className="my-5">
+        {success && (
+          <Alert variant="success" className="mb-4" onClose={() => setSuccess(false)} dismissible>
+            Course successfully updated! Redirecting...
+          </Alert>
+        )}
+        
+        {error && (
+          <Alert variant="danger" className="mb-4" onClose={() => setError(null)} dismissible>
+            {error}
+          </Alert>
+        )}
+        
+        <Card className="shadow-lg border-0">
+          <Card.Header className="bg-warning text-dark">
+            <h2 className="text-center my-2">Update Cooking Course</h2>
+          </Card.Header>
+          
+          <Card.Body className="p-4">
+            <Form onSubmit={handleSubmit}>
+              <Row>
+                {/* Course Details Section */}
+                <Col md={12}>
+                  <h4 className="mb-3 text-warning">Course Information</h4>
+                  <Row className="mb-4">
+                    <Col md={6}>
+                      <Form.Group className="mb-3">
+                        <Form.Label>Course Title</Form.Label>
+                        <Form.Control
+                          type="text"
+                          name="title"
+                          value={formData.title}
+                          onChange={handleChange}
+                          placeholder="E.g., Mastering Italian Cuisine"
+                          required
+                        />
+                      </Form.Group>
+                    </Col>
+                    
+                    <Col md={6}>
+                      <Form.Group className="mb-3">
+                        <Form.Label>Chef Name</Form.Label>
+                        <Form.Control
+                          type="text"
+                          name="chefName"
+                          value={formData.chefName}
+                          onChange={handleChange}
+                          placeholder="Your name or professional title"
+                          required
+                        />
+                      </Form.Group>
+                    </Col>
+
+                    <Col md={6}>
+                      <Form.Group className="mb-3">
+                        <Form.Label>Publication Date</Form.Label>
+                        <Form.Control
+                          type="date"
+                          name="date"
+                          value={formData.date}
+                          onChange={handleChange}
+                          required
+                        />
+                      </Form.Group>
+                    </Col>
+
+                    <Col md={6}>
+                      <Form.Group className="mb-3">
+                        <Form.Label>Course Banner Image</Form.Label>
+                        <div className="input-group">
+                          <Form.Control
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageUpload}
+                            className="form-control"
+                          />
+                          <span className="input-group-text">
+                            <BsUpload />
+                          </span>
+                        </div>
+                        {imagePreview && (
+                          <div className="mt-2 text-center">
+                            <img
+                              src={imagePreview}
+                              alt="Course preview"
+                              className="img-thumbnail"
+                              style={{ height: "150px", objectFit: "cover" }}
+                            />
+                            <p className="text-muted mt-1">
+                              {currentImageUrl && !image ? "Current image" : "New image selected"}
+                            </p>
+                          </div>
+                        )}
+                        <Form.Text className="text-muted">
+                          Recommended size: 1200x600px, max 5MB
+                        </Form.Text>
+                      </Form.Group>
+                    </Col>
+
+                    <Col md={6}>
+                      <Form.Group className="mb-3">
+                        <Form.Label>Difficulty Level</Form.Label>
+                        <Form.Select 
+                          name="level"
+                          value={formData.level}
+                          onChange={handleChange}
+                          required
+                        >
+                          <option value="beginner">Beginner</option>
+                          <option value="intermediate">Intermediate</option>
+                          <option value="advanced">Advanced</option>
+                          <option value="professional">Professional</option>
+                        </Form.Select>
+                      </Form.Group>
+                    </Col>
+
+                    <Col md={6}>
+                      <Form.Group className="mb-3">
+                        <Form.Label>Category</Form.Label>
+                        <Form.Select
+                          name="category"
+                          value={formData.category}
+                          onChange={handleChange}
+                          required
+                        >
+                          <option value="">Select a category</option>
+                          <option value="baking">Baking & Pastry</option>
+                          <option value="main-course">Main Courses</option>
+                          <option value="appetizers">Appetizers & Starters</option>
+                          <option value="desserts">Desserts</option>
+                          <option value="beverages">Beverages & Drinks</option>
+                          <option value="techniques">Cooking Techniques</option>
+                          <option value="healthy">Healthy Cooking</option>
+                          <option value="quick">Quick & Easy</option>
+                          <option value="vegetarian">Vegetarian & Vegan</option>
+                        </Form.Select>
+                      </Form.Group>
+                    </Col>
+
+                    <Col md={6}>
+                      <Form.Group className="mb-3">
+                        <Form.Label>Cuisine Type</Form.Label>
+                        <Form.Select
+                          name="cuisine"
+                          value={formData.cuisine}
+                          onChange={handleChange}
+                          required
+                        >
+                          <option value="">Select cuisine type</option>
+                          <option value="italian">Italian</option>
+                          <option value="french">French</option>
+                          <option value="indian">Indian</option>
+                          <option value="chinese">Chinese</option>
+                          <option value="japanese">Japanese</option>
+                          <option value="mexican">Mexican</option>
+                          <option value="mediterranean">Mediterranean</option>
+                          <option value="american">American</option>
+                          <option value="thai">Thai</option>
+                          <option value="middle-eastern">Middle Eastern</option>
+                          <option value="other">Other</option>
+                        </Form.Select>
+                      </Form.Group>
+                    </Col>
+
+                    <Col md={6}>
+                      <Form.Group className="mb-3">
+                        <Form.Label>Course Duration</Form.Label>
+                        <Form.Select
+                          name="duration"
+                          value={formData.duration}
+                          onChange={handleChange}
+                          required
+                        >
+                          <option value="">Select duration</option>
+                          <option value="under-1-hour">Under 1 hour</option>
+                          <option value="1-2-hours">1-2 hours</option>
+                          <option value="2-4-hours">2-4 hours</option>
+                          <option value="4-6-hours">4-6 hours</option>
+                          <option value="6-plus-hours">6+ hours</option>
+                        </Form.Select>
+                      </Form.Group>
+                    </Col>
+
+                    <Col md={12}>
+                      <Form.Group className="mb-3">
+                        <Form.Label>Course Description</Form.Label>
+                        <Form.Control
+                          as="textarea"
+                          rows={3}
+                          name="description"
+                          value={formData.description}
+                          onChange={handleChange}
+                          placeholder="Provide an overview of what students will learn in this course..."
+                          required
+                        />
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                </Col>
+
+                {/* Lessons Section */}
+                <Col md={12}>
+                  <div className="d-flex justify-content-between align-items-center mb-3">
+                    <h4 className="text-warning mb-0">Course Lessons ({lessons.length})</h4>
+                    <Button 
+                      variant="outline-success" 
+                      onClick={addLesson}
+                      className="d-flex align-items-center"
+                    >
+                      <BsPlusCircle className="me-2" /> Add New Lesson
+                    </Button>
+                  </div>
+                  <p className="text-muted mb-4">Update or modify lessons for your course.</p>
+                  
+                  {lessons.map((lesson, index) => (
+                    <Card key={index} className="mb-4 border-light shadow-sm">
+                      <Card.Header className="bg-light d-flex justify-content-between align-items-center">
+                        <h5 className="mb-0">Lesson {index + 1}</h5>
+                        <Button 
+                          variant="outline-danger" 
+                          size="sm" 
+                          onClick={() => removeLesson(index)}
+                          disabled={lessons.length === 1}
+                          title={lessons.length === 1 ? "Course must have at least one lesson" : "Remove this lesson"}
+                        >
+                          <BsTrash />
+                        </Button>
+                      </Card.Header>
+                      <Card.Body>
+                        <Row>
+                          <Col md={12}>
+                            <Form.Group className="mb-3">
+                              <Form.Label>Lesson Title</Form.Label>
+                              <Form.Control
+                                type="text"
+                                value={lesson.lessonHeading}
+                                onChange={(e) => handleLessonChange(index, "lessonHeading", e.target.value)}
+                                placeholder={`E.g., Basic Knife Skills - Part ${index + 1}`}
+                                required
+                              />
+                            </Form.Group>
+                          </Col>
+                          
+                          <Col md={12}>
+                            <Form.Group className="mb-3">
+                              <Form.Label>Lesson Content</Form.Label>
+                              <Form.Control
+                                as="textarea"
+                                rows={3}
+                                value={lesson.lessonContent}
+                                onChange={(e) => handleLessonChange(index, "lessonContent", e.target.value)}
+                                placeholder="Detailed step-by-step instructions for this lesson..."
+                                required
+                              />
+                            </Form.Group>
+                          </Col>
+                          
+                          <Col md={6}>
+                            <Form.Group className="mb-3">
+                              <Form.Label>Short Description</Form.Label>
+                              <Form.Control
+                                type="text"
+                                value={lesson.description}
+                                onChange={(e) => handleLessonChange(index, "description", e.target.value)}
+                                placeholder="Brief overview of this lesson's content"
+                                required
+                              />
+                            </Form.Group>
+                          </Col>
+                          
+                          <Col md={6}>
+                            <Form.Group className="mb-3">
+                              <Form.Label>Resource URL</Form.Label>
+                              <Form.Control
+                                type="url"
+                                value={lesson.url}
+                                onChange={(e) => handleLessonChange(index, "url", e.target.value)}
+                                placeholder="Link to video or additional resources"
+                              />
+                            </Form.Group>
+                          </Col>
+                          
+                          <Col md={6}>
+                            <Form.Group className="mb-3">
+                              <Form.Label>Lesson Type</Form.Label>
+                              <Form.Select
+                                value={lesson.type || ""}
+                                onChange={(e) => handleLessonChange(index, "type", e.target.value)}
+                                required
+                              >
+                                <option value="">Select lesson type</option>
+                                <option value="video">Video Lesson</option>
+                                <option value="recipe">Recipe</option>
+                                <option value="technique">Technique Demonstration</option>
+                                <option value="theory">Culinary Theory</option>
+                                <option value="tips">Tips & Tricks</option>
+                              </Form.Select>
+                            </Form.Group>
+                          </Col>
+                          
+                          <Col md={6}>
+                            <Form.Group className="mb-3">
+                              <Form.Label>Estimated Time (minutes)</Form.Label>
+                              <Form.Control
+                                type="number"
+                                min="1"
+                                value={lesson.duration || ""}
+                                onChange={(e) => handleLessonChange(index, "duration", e.target.value)}
+                                placeholder="e.g., 15"
+                                required
+                              />
+                            </Form.Group>
+                          </Col>
+                        </Row>
+                      </Card.Body>
+                    </Card>
+                  ))}
+                </Col>
+              </Row>
+
+              {/* Submit Button */}
+              <div className="d-grid gap-2 mt-4">
+                <Button 
+                  type="submit" 
+                  variant="warning" 
+                  size="lg" 
+                  className="fw-bold" 
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <>
+                      <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
+                      <span className="ms-2">Updating...</span>
+                    </>
+                  ) : (
+                    <>
+                      <BsSave className="me-2" /> Update Course
+                    </>
+                  )}
+                </Button>
+              </div>
+            </Form>
+          </Card.Body>
+        </Card>
+      </Container>
+    </>
   );
 };
 

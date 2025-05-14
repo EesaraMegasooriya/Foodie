@@ -10,6 +10,7 @@ public class LessonResponse {
     private String url;
     private String type;
     private String duration;
+    
 
     public LessonResponse(CourseLesson lesson) {
         this.id = lesson.getId();

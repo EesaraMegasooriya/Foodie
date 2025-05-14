@@ -1,7 +1,7 @@
 package com.example.foodapp.model;
+
 import jakarta.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Table(name = "courses")
@@ -18,16 +18,30 @@ public class Course {
     private String category;
     private String cuisine;
     private String ageRecommendation;
-    private String duration;  // Added missing field
+    private String duration;
     private String imageUrl;
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CourseLesson> lessons = new ArrayList<>();
 
+    @ManyToMany
+    @JoinTable(name = "course_likes",
+            joinColumns = @JoinColumn(name = "course_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id"))
+    private Set<User> likedUsers = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(name = "course_favourites",
+            joinColumns = @JoinColumn(name = "course_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id"))
+    private Set<User> favouritedUsers = new HashSet<>();
+
+    private Long version;
+
+    // Constructors
     public Course() {
     }
 
-    private Long version;
     // Getters and setters
     public Long getId() {
         return id;
@@ -101,11 +115,11 @@ public class Course {
         this.ageRecommendation = ageRecommendation;
     }
 
-    public String getDuration() {  // Added missing getter
+    public String getDuration() {
         return duration;
     }
 
-    public void setDuration(String duration) {  // Added missing setter
+    public void setDuration(String duration) {
         this.duration = duration;
     }
 
@@ -125,7 +139,31 @@ public class Course {
         this.lessons = lessons;
     }
 
-    // Helper methods for bidirectional relationship
+    public Set<User> getLikedUsers() {
+        return likedUsers;
+    }
+
+    public void setLikedUsers(Set<User> likedUsers) {
+        this.likedUsers = likedUsers;
+    }
+
+    public Set<User> getFavouritedUsers() {
+        return favouritedUsers;
+    }
+
+    public void setFavouritedUsers(Set<User> favouritedUsers) {
+        this.favouritedUsers = favouritedUsers;
+    }
+
+    public int getLikeCount() {
+        return likedUsers.size();
+    }
+
+    public int getFavouriteCount() {
+        return favouritedUsers.size();
+    }
+
+    // Helper methods for bidirectional relationship with lessons
     public void addLesson(CourseLesson lesson) {
         lessons.add(lesson);
         lesson.setCourse(this);
@@ -136,7 +174,6 @@ public class Course {
         lesson.setCourse(null);
     }
 
-    // Optional: toString() method
     @Override
     public String toString() {
         return "Course{" +

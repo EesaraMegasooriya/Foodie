@@ -5,6 +5,8 @@ import com.example.foodapp.dto.LessonDto;
 import com.example.foodapp.model.Course;
 import com.example.foodapp.model.CourseLesson;
 import com.example.foodapp.repository.CourseRepository;
+import com.example.foodapp.repository.UserRepository;
+import com.example.foodapp.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +21,29 @@ public class CourseService {
 
     private final CourseRepository courseRepository;
     private final FileStorageService fileStorageService;
+    private UserRepository userRepository;
+    public void likeCourse(Long courseId, Long userId) {
+        Course course = courseRepository.findById(courseId).orElseThrow();
+        User user = userRepository.findById(userId).orElseThrow();
+        course.getLikedUsers().add(user);
+        courseRepository.save(course);
+        
+    }
+    
+    public void favouriteCourse(Long courseId, Long userId) {
+        Course course = courseRepository.findById(courseId).orElseThrow();
+        User user = userRepository.findById(userId).orElseThrow();
+        course.getFavouritedUsers().add(user);
+        courseRepository.save(course);
+    }
+
+    public int getLikeCount(Long courseId) {
+        return courseRepository.findById(courseId).map(Course::getLikeCount).orElse(0);
+    }
+
+    public int getFavouriteCount(Long courseId) {
+        return courseRepository.findById(courseId).map(Course::getFavouriteCount).orElse(0);
+    }
 
     @Autowired
     public CourseService(CourseRepository courseRepository, FileStorageService fileStorageService) {

@@ -25,6 +25,8 @@ public class CourseController {
         this.objectMapper = objectMapper;
     }
 
+    // ======== Course CRUD Operations ========
+
     @GetMapping
     public ResponseEntity<List<CourseResponse>> getAllCourses() {
         List<CourseResponse> courses = courseService.getAllCourses();
@@ -57,7 +59,8 @@ public class CourseController {
             courseRequest.setAgeRecommendation(ageRecommendation);
             courseRequest.setDuration(duration);
 
-            List<LessonDto> lessons = objectMapper.readValue(lessonsJson,
+            List<LessonDto> lessons = objectMapper.readValue(
+                    lessonsJson,
                     objectMapper.getTypeFactory().constructCollectionType(List.class, LessonDto.class));
             courseRequest.setLessons(lessons);
 
@@ -104,7 +107,8 @@ public class CourseController {
             courseRequest.setAgeRecommendation(ageRecommendation);
             courseRequest.setDuration(duration);
 
-            List<LessonDto> lessons = objectMapper.readValue(lessonsJson,
+            List<LessonDto> lessons = objectMapper.readValue(
+                    lessonsJson,
                     objectMapper.getTypeFactory().constructCollectionType(List.class, LessonDto.class));
             courseRequest.setLessons(lessons);
 
@@ -122,5 +126,29 @@ public class CourseController {
     public ResponseEntity<Void> deleteCourse(@PathVariable Long id) {
         boolean deleted = courseService.deleteCourse(id);
         return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+    }
+
+    // ======== Like & Favourite Endpoints ========
+
+    @PostMapping("/{courseId}/like")
+    public ResponseEntity<Void> likeCourse(@PathVariable Long courseId, @RequestParam Long userId) {
+        courseService.likeCourse(courseId, userId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{courseId}/favourite")
+    public ResponseEntity<Void> favouriteCourse(@PathVariable Long courseId, @RequestParam Long userId) {
+        courseService.favouriteCourse(courseId, userId);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{courseId}/like-count")
+    public ResponseEntity<Integer> getLikeCount(@PathVariable Long courseId) {
+        return ResponseEntity.ok(courseService.getLikeCount(courseId));
+    }
+
+    @GetMapping("/{courseId}/favourite-count")
+    public ResponseEntity<Integer> getFavouriteCount(@PathVariable Long courseId) {
+        return ResponseEntity.ok(courseService.getFavouriteCount(courseId));
     }
 }
