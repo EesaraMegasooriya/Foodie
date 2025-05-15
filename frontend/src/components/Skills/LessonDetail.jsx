@@ -608,47 +608,25 @@ const LessonDetail = () => {
             <Tab eventKey="lessons" title={`Lessons (${lesson.lessons?.length || 0})`}>
               <div className="mt-4">
                 {lesson.lessons?.length > 0 ? (
-                  <Accordion defaultActiveKey="0">
-                    {lesson.lessons.map((item, index) => (
-                      <Accordion.Item eventKey={index.toString()} key={index}>
-                        <Accordion.Header>
-                          <div className="d-flex justify-content-between w-100 pe-3">
-                            <div>
-                              <strong>{item.lessonHeading}</strong>
-                              <Badge bg="info" className="ms-2">{item.type}</Badge>
-                            </div>
-                            <div className="text-muted">
-                              {item.duration} mins
-                            </div>
-                          </div>
-                        </Accordion.Header>
-                        <Accordion.Body>
-                          <p className="mb-3">{item.description}</p>
-                          
-                          {item.lessonContent && (
-                            <div className="mb-3 p-3 bg-light rounded">
-                              <h6>Lesson Content:</h6>
-                              <p style={{ whiteSpace: 'pre-line' }}>{item.lessonContent}</p>
-                            </div>
-                          )}
-                          
-                          {item.url && (
-                            <div className="mt-3">
-                              <Button 
-                                variant="outline-primary" 
-                                as="a" 
-                                href={item.url} 
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                View Additional Resources
-                              </Button>
-                            </div>
-                          )}
-                        </Accordion.Body>
-                      </Accordion.Item>
-                    ))}
-                  </Accordion>
+                        <Accordion defaultActiveKey="0">
+            <Accordion.Item eventKey="0">
+              <Accordion.Header>Ingredients</Accordion.Header>
+              <Accordion.Body>
+                <ul>
+                  {lesson.ingredients?.map((item, i) => <li key={i}>{item}</li>)}
+                </ul>
+              </Accordion.Body>
+            </Accordion.Item>
+            <Accordion.Item eventKey="1">
+              <Accordion.Header>Steps</Accordion.Header>
+              <Accordion.Body>
+                <ol>
+                  {lesson.steps?.map((step, i) => <li key={i}>{step}</li>)}
+                </ol>
+              </Accordion.Body>
+            </Accordion.Item>
+          </Accordion>
+
                 ) : (
                   <Alert variant="info">No lessons available for this course</Alert>
                 )}

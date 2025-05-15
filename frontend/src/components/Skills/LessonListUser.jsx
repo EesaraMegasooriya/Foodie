@@ -131,23 +131,40 @@ const LessonListUser = () => {
     <Container className="py-4">
       <h2 className="text-center mb-4 fw-bold">Discover Cooking Lessons</h2>
 
-      <div className="d-flex justify-content-end mb-3">
-        <Button
-          variant={viewMode === 'table' ? 'primary' : 'outline-primary'}
-          size="sm"
-          onClick={() => setViewMode('table')}
-          className="me-2"
-        >
-          Table View
-        </Button>
-        <Button
-          variant={viewMode === 'grid' ? 'primary' : 'outline-primary'}
-          size="sm"
-          onClick={() => setViewMode('grid')}
-        >
-          Grid View
-        </Button>
-      </div>
+              <div className="d-flex justify-content-between mb-3">
+          <Button
+            variant="success"
+            size="sm"
+            onClick={() => navigate('/skills/add-lesson')} // Adjust the route as needed
+            className="me-2"
+            style={{
+              background: 'linear-gradient(135deg, #28a745 0%, #20c997 100%)',
+              border: 'none',
+              boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
+              fontWeight: '600'
+            }}
+          >
+            + Create Lesson
+          </Button>
+          
+          <div>
+            <Button
+              variant={viewMode === 'table' ? 'primary' : 'outline-primary'}
+              size="sm"
+              onClick={() => setViewMode('table')}
+              className="me-2"
+            >
+              Table View
+            </Button>
+            <Button
+              variant={viewMode === 'grid' ? 'primary' : 'outline-primary'}
+              size="sm"
+              onClick={() => setViewMode('grid')}
+            >
+              Grid View
+            </Button>
+          </div>
+        </div>
 
       <Card className="mb-4 p-3 shadow-sm">
         <Form>

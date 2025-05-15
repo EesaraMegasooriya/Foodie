@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { Container } from 'react-bootstrap';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Container } from 'react-bootstrap';
 import Swal from 'sweetalert2';
-
+import { useNavigate } from 'react-router-dom';
 
 function CreateEvent() {
   const [eventData, setEventData] = useState({
@@ -11,123 +11,291 @@ function CreateEvent() {
     eventDate: '',
     eventTime: '',
     location: '',
-    category: 'workshop',
+    category: '',
     registrationFee: '',
     maxParticipants: '',
     instructorName: '',
     instructorBio: '',
-    userId: 1, // Set dynamically if needed
+    userId: null,
   });
 
-  const handleChange = (e) => {
-    setEventData({ ...eventData, [e.target.name]: e.target.value });
+  // Set userId from localStorage on mount
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (user && user.id) {
+      setEventData((prev) => ({ ...prev, userId: user.id }));
+    }
+  }, []);
+
+  const payload = {
+    ...eventData,
+    registrationFee: Number(eventData.registrationFee),
+    maxParticipants: Number(eventData.maxParticipants),
+    type: eventData.type,
+    link: eventData.link,
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setEventData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async () => {
+    const {
+      title, description, eventDate, eventTime, location, link,
+      category, registrationFee, maxParticipants,
+      instructorName, instructorBio, type, userId
+    } = eventData;
+
+    if (
+      !title || !description || !eventDate || !eventTime ||
+      !category || !registrationFee || !maxParticipants ||
+      !instructorName || !instructorBio || !type || !userId
+    ) {
+      return Swal.fire({ icon: 'warning', title: 'All fields are required!' });
+    }
+
     try {
-      await axios.post('http://localhost:8080/api/events', eventData);
+      await axios.post('http://localhost:8080/api/events', payload);
       Swal.fire({
         icon: 'success',
-        title: 'Event Created!',
-        text: 'Your event was successfully created.',
-        confirmButtonColor: '#3085d6'
+        title: 'Event created successfully!',
+        text: 'Redirecting to browse page...',
+        showConfirmButton: false,
+        timer: 1500,
       });
-      setEventData({
-        title: '',
-        description: '',
-        eventDate: '',
-        eventTime: '',
-        location: '',
-        category: '',
-        registrationFee: '',
-        maxParticipants: '',
-        instructorName: '',
-        instructorBio: '',
-        likes: '',
-        userId: 2,
-      });
+      setTimeout(() => navigate('/events/browse'), 1500);
     } catch (error) {
       console.error('Error creating event:', error);
       Swal.fire({
         icon: 'error',
         title: 'Oops...',
-        text: 'Failed to create the event. Please try again.',
-        confirmButtonColor: '#d33'
+        text: error.response?.data?.message || 'Failed to create event.',
       });
     }
   };
 
   return (
-    <div>
-      <Container className="p-4 bg-white rounded">
-        <h2 className="text-left fw-bold">Host an Event</h2>
-        <p className="text-left w-100 fw-sm pb-4">
-          Share your creative skills with the community by hosting an event. Fill out the form below.
+    <div style={{ backgroundColor: '#fff3cd', minHeight: '100vh' }}>
+      <div className='px-5 pt-4'>
+        <h2 className='pb-2 fw-bold'>Host an Event</h2>
+        <p className='w-100 fw-sm'>
+          Share your creative skills with the community by hosting an event. Fill out the form below with your event details.
         </p>
+      </div>
 
-        <form onSubmit={handleSubmit}>
-          <div className="mt-2 d-flex flex-column">
-            <p className="mb-1">Event Title</p>
-            <input type="text" name="title" value={eventData.title} onChange={handleChange} className="form-control" placeholder="Enter event title" />
+      <Container className='p-4 bg-white rounded shadow-sm my-4'>
+        <h5 className="fw-bold mb-3">Create a New Event</h5>
+
+        {/* Title */}
+        <div className='mb-3'>
+          <label className='mb-1'>Event Title</label>
+          <input
+            type="text"
+            name="title"
+            className="form-control"
+            placeholder="Enter event title"
+            maxLength={60}
+            value={eventData.title}
+            onChange={handleChange}
+          />
+          <small className="text-muted">{eventData.title.length}/60 characters</small>
+        </div>
+
+        {/* Description */}
+        <div className="mb-3">
+          <label className="mb-1">Description</label>
+          <textarea
+            name="description"
+            className={`form-control ${eventData.description.length > 0 && eventData.description.length < 50 ? 'border border-danger' : ''}`}
+            placeholder="Enter event description (min 50 characters)"
+            value={eventData.description}
+            onChange={handleChange}
+          />
+          <small className={`mt-1 ${eventData.description.length < 50 ? 'text-danger' : 'text-muted'}`}>
+            Need more than 50 characters
+          </small>
+        </div>
+
+        {/* Date & Time */}
+        <div className='d-flex gap-3 mb-3'>
+          <div className='flex-grow-1'>
+            <label className='mb-1'>Event Date</label>
+            <input
+              type="date"
+              name="eventDate"
+              className="form-control"
+              min={new Date().toISOString().split("T")[0]}
+              value={eventData.eventDate}
+              onChange={handleChange}
+            />
+          </div>
+          <div className='flex-grow-1'>
+            <label className='mb-1'>Event Time</label>
+            <input
+              type="time"
+              name="eventTime"
+              className="form-control"
+              value={eventData.eventTime}
+              onChange={handleChange}
+            />
+          </div>
+        </div>
+
+        {/* Type + Location/Link */}
+        <div className='d-flex gap-3 mb-3'>
+          <div className="flex-grow-1">
+            <label className="mb-1">Type</label>
+            <select
+              name="type"
+              className="form-select"
+              value={eventData.type || ''}
+              onChange={handleChange}
+            >
+              <option value="" disabled>Select Event Type</option>
+              <option value="Physical">Physical</option>
+              <option value="Online">Online</option>
+            </select>
           </div>
 
-          <div className="mt-4 d-flex flex-column">
-            <p className="mb-1">Description</p>
-            <textarea name="description" value={eventData.description} onChange={handleChange} className="form-control" placeholder="Enter event description" />
-          </div>
-
-          <div className="mt-3 d-flex gap-3 w-100">
-            <div className="mt-2 flex-grow-1">
-              <p className="mb-1">Event Date</p>
-              <input type="date" name="eventDate" value={eventData.eventDate} onChange={handleChange} className="form-control" />
+          {eventData.type === "Physical" && (
+            <div className='flex-grow-2 w-100'>
+              <label className='mb-1'>Event Location</label>
+              <input
+                type="text"
+                name="location"
+                className="form-control"
+                placeholder="Enter physical address"
+                value={eventData.location}
+                onChange={handleChange}
+              />
             </div>
-            <div className="mt-2 flex-grow-1">
-              <p className="mb-1">Event Time</p>
-              <input type="time" name="eventTime" value={eventData.eventTime} onChange={handleChange} className="form-control" placeholder="Enter event time" />
+          )}
+
+          {eventData.type === "Online" && (
+            <div className='flex-grow-2 w-100'>
+              <label className='mb-1'>Event Link</label>
+              <input
+                type="url"
+                name="link"
+                className="form-control"
+                placeholder="Paste online meeting link"
+                value={eventData.link}
+                onChange={handleChange}
+              />
             </div>
+          )}
+        </div>
+
+        {/* Category, Fee, Participants */}
+        <div className='d-flex gap-3 mb-3'>
+          <div className="flex-grow-1">
+            <label className="mb-1">Category</label>
+            <select
+              name="category"
+              className="form-select"
+              value={eventData.category}
+              onChange={handleChange}
+            >
+              <option value="" disabled>Select Category</option>
+              <option value="Workshop">Workshop</option>
+              <option value="Seminar">Seminar</option>
+              <option value="Conference">Conference</option>
+            </select>
           </div>
 
-          <div className="mt-4 d-flex flex-column">
-            <p className="mb-1">Event Location</p>
-            <input type="text" name="location" value={eventData.location} onChange={handleChange} className="form-control" placeholder="Enter event location" />
+          <div className='flex-grow-1'>
+            <label className='mb-1'>Registration Fee ($)</label>
+            <input
+              type="text"
+              name="registrationFee"
+              className="form-control"
+              placeholder="Enter fee"
+              value={eventData.registrationFee}
+              onChange={(e) => {
+                if (/^\d*\.?\d*$/.test(e.target.value)) handleChange(e);
+              }}
+            />
           </div>
 
-          <div className="mt-3 d-flex gap-3 w-100">
-            <div className="mt-2 flex-grow-1">
-              <p className="mb-1">Category</p>
-              <select name="category" value={eventData.category} onChange={handleChange} className="form-select">
-                <option value="workshop">Workshop</option>
-                <option value="seminar">Seminar</option>
-                <option value="conference">Conference</option>
-              </select>
-            </div>
-
-            <div className="mt-2 flex-grow-1">
-              <p className="mb-1">Registration Fee ($)</p>
-              <input type="number" name="registrationFee" value={eventData.registrationFee} onChange={handleChange} className="form-control" placeholder="Enter registration fee" />
-            </div>
-
-            <div className="mt-2 flex-grow-1">
-              <p className="mb-1">Maximum Participants</p>
-              <input type="number" name="maxParticipants" value={eventData.maxParticipants} onChange={handleChange} className="form-control" placeholder="Enter maximum participants" />
-            </div>
+          <div className='flex-grow-1'>
+            <label className='mb-1'>Max Participants</label>
+            <input
+              type="text"
+              name="maxParticipants"
+              className="form-control"
+              placeholder="Enter number"
+              value={eventData.maxParticipants}
+              onChange={(e) => {
+                if (/^\d*$/.test(e.target.value)) handleChange(e);
+              }}
+            />
           </div>
+        </div>
 
-          <div className="mt-4 d-flex flex-column">
-            <p className="mb-1">Instructor Name</p>
-            <input type="text" name="instructorName" value={eventData.instructorName} onChange={handleChange} className="form-control" placeholder="Enter instructor name" />
-          </div>
+        {/* Instructor */}
+        <div className='mb-3'>
+          <label className='mb-1'>
+            {eventData.category === "Workshop"
+              ? "Facilitator Name"
+              : eventData.category === "Seminar"
+              ? "Speaker Name"
+              : eventData.category === "Conference"
+              ? "Keynote Speaker"
+              : "Instructor Name"}
+          </label>
+          <input
+            type="text"
+            name="instructorName"
+            className="form-control"
+            placeholder="Enter name"
+            value={eventData.instructorName}
+            onChange={(e) => {
+              const onlyLetters = e.target.value;
+              if (/^[A-Za-z.\s]*$/.test(onlyLetters)) handleChange(e);
+            }}
+          />
+        </div>
 
-          <div className="mt-4 d-flex flex-column">
-            <p className="mb-1">Instructor Bio</p>
-            <textarea name="instructorBio" value={eventData.instructorBio} onChange={handleChange} className="form-control" placeholder="Tell participants about the instructor" />
-          </div>
+        <div className="mb-4">
+          <label className="mb-1">
+            {eventData.category === "Workshop"
+              ? "Facilitator Bio"
+              : eventData.category === "Seminar"
+              ? "Speaker Bio"
+              : eventData.category === "Conference"
+              ? "Keynote Bio"
+              : "Instructor Bio"}
+          </label>
+          <textarea
+            name="instructorBio"
+            className="form-control"
+            placeholder="Tell participants about instructor"
+            rows={3}
+            value={eventData.instructorBio}
+            onChange={handleChange}
+          />
+        </div>
 
-          <div className="d-flex justify-content-end mt-3">
-            <button type="submit" className="btn btn-primary">Create Event</button>
-          </div>
-        </form>
+        {/* Submit */}
+        <div className='d-flex justify-content-end'>
+          <button
+            className='btn fw-bold text-dark'
+            style={{
+              backgroundColor: '#f8c035',
+              borderColor: '#f8c035',
+              padding: '10px 20px'
+            }}
+            onClick={handleSubmit}
+          >
+            Create Event
+          </button>
+        </div>
       </Container>
     </div>
   );
