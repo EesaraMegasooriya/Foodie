@@ -22,18 +22,6 @@ const recipes = [
     image: "crunchy-potatoes.jpg",
   },
   {
-    title: "Mushroom Soup",
-    time: "25 mins",
-    rating: "4.1",
-    image: "mushroom-soup.jpg",
-  },
-  {
-    title: "Raspberry Pancake",
-    time: "20 mins",
-    rating: "4.7",
-    image: "raspberry-pancake.jpg",
-  },
-  {
     title: "Beef Teriyaki",
     time: "35 mins",
     rating: "4.6",
