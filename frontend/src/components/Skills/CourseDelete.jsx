@@ -8,7 +8,7 @@ const CourseDelete = () => {
 
   useEffect(() => {
     axios
-      .delete(`http://localhost:8081/api/lessons/${id}`)
+      .delete(`http://localhost:8080/api/lessons/${id}`)
       .then(() => {
         alert("Lesson deleted");
         navigate("/lessons");

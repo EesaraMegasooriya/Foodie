@@ -29,7 +29,7 @@ function Register() {
     e.preventDefault();
 
     try {
-      const res = await axios.post('http://localhost:8081/api/auth/register', formData);
+      const res = await axios.post('http://localhost:8080/api/auth/register', formData);
       alert('Registration successful!');
       console.log(res.data);
       navigate('/login');
@@ -40,7 +40,7 @@ function Register() {
   };
 
   const handleGoogleAuth = () => {
-    window.location.href = 'http://localhost:8081/oauth2/authorization/google';
+    window.location.href = 'http://localhost:8080/oauth2/authorization/google';
   };
 
   return (

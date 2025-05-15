@@ -75,7 +75,7 @@ public class CourseResponse {
 
     public String getImageUrl() {
         // Return full URL for the image
-        return imageUrl != null ? "http://localhost:8081/" + imageUrl : null;
+        return imageUrl != null ? "http://localhost:8080/" + imageUrl : null;
     }
 
     public String getDuration() {

@@ -53,6 +53,7 @@ public class SecurityConfig {
             .logout(logout -> logout.disable())
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**", "/oauth2/**", "/uploads/**", "/api/courses").permitAll()
+                .requestMatchers("/*.jpg", "/*.png", "/*.jpeg").permitAll()
                 .anyRequest().authenticated()
             )
             .exceptionHandling(ex -> ex
