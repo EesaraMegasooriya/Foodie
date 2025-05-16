@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "course_lessons")
+
 public class CourseLesson {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -13,11 +14,12 @@ public class CourseLesson {
 
     @Column(columnDefinition = "TEXT")
     private String lessonContent;
-
     private String description;
     private String url;
     private String type;
     private String duration;
+    
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id")
@@ -92,4 +94,5 @@ public class CourseLesson {
     public void setCourse(Course course) {
         this.course = course;
     }
+    
 }

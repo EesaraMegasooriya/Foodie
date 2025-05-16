@@ -9,7 +9,8 @@ import {
   Alert,
   Spinner,
 } from "react-bootstrap";
-import { BsUpload, BsPlusCircle, BsTrash } from "react-icons/bs";
+import { BsUpload, BsPlusCircle, BsTrash, BsArrowLeft } from "react-icons/bs";
+
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom"; // assumes you're using React Router
 import api from "../../api";
@@ -319,9 +320,15 @@ const AddLesson = () => {
         </Alert>
       )}
 
-      <Card className='shadow-lg border-0'>
-        <Card.Header className='bg-warning text-dark'>
-          <h2 className='text-center my-2'>Create New Cooking Course</h2>
+            <Card className='shadow-lg border-0'>
+        <Card.Header style={{
+          background: 'linear-gradient(135deg, #FFC107 0%, #FFA000 100%)',
+          borderRadius: '0.5rem 0.5rem 0 0',
+          padding: '1.5rem',
+          textAlign: 'center',
+          color: '#000'
+        }}>
+          <h2 className='mb-0 fw-bold'>Create New Cooking Course</h2>
         </Card.Header>
 
         <Card.Body className='p-4'>
@@ -512,13 +519,18 @@ const AddLesson = () => {
                   <h4 className='text-warning mb-0'>
                     Course Lessons ({lessons.length})
                   </h4>
-                  <Button
-                    variant='outline-success'
-                    onClick={addLesson}
-                    className='d-flex align-items-center'
-                  >
-                    <BsPlusCircle className='me-2' /> Add New Lesson
-                  </Button>
+                               <Button
+                variant='warning'  // Bootstrap yellow/orange base
+                onClick={addLesson}
+                className='d-flex align-items-center fw-bold'  // Added fw-bold for better visibility
+                style={{
+                  backgroundColor: '#FFC107',  // Dark yellow
+                  borderColor: '#FFC107',      // Matching border
+                  color: '#000000'             // Black text
+                }}
+              >
+                <BsPlusCircle className='me-2' /> Add New Lesson
+              </Button>
                 </div>
                 <p className='text-muted mb-4'>
                   Create lessons for your course with detailed content and
@@ -697,6 +709,16 @@ const AddLesson = () => {
                   </>
                 )}
               </Button>
+              <Button
+                variant="warning"
+                size="lg"
+                className="fw-bold"
+                onClick={() => navigate('/skills/userlist')}  // Navigates to user list
+              >
+                <BsArrowLeft className="me-2" /> Back to Cources
+              </Button>
+              
+              
             </div>
           </Form>
         </Card.Body>

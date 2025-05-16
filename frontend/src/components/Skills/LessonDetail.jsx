@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { FaYoutube } from "react-icons/fa";
+
 import {
   Container,
   Card,
@@ -66,6 +68,7 @@ const LessonDetail = () => {
 
   const [imagePreview, setImagePreview] = useState(null);
   const [image, setImage] = useState(null);
+  
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -159,30 +162,73 @@ const LessonDetail = () => {
 
   const addComment = async () => {
     if (!commentText.trim()) {
+      setError("Comment cannot be empty");
+      return;
+    }
+
+    if (!id) {
+      setError("Course ID is missing");
+      return;
+    }
+
+    if (!currentUser || !currentUser.id || !currentUser.username) {
+      setError("User not authenticated");
+      return;
+    }
+
+    const token = localStorage.getItem("jwt_token");
+    if (!token) {
+      setError("Authentication token missing");
       return;
     }
 
     try {
+      const url = `${API_BASE_URL}/api/courses/${id}/comments`;
+      console.log("Posting to:", url, "with payload:", {
+        content: commentText,
+        userId: currentUser.id,
+        username: currentUser.username,
+      });
       const response = await api.post(
-        `${API_BASE_URL}/api/courses/${id}/comments`,
-        { text: commentText },
-        { withCredentials: true }
+        url,
+        {
+          content: commentText,
+          userId: currentUser.id,
+          username: currentUser.username,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
 
-      // Check if response.data.comments exists, otherwise use response.data
-      const updatedComments = response.data.comments || response.data;
+      const newComment = response.data;
 
       setLesson((prev) => ({
         ...prev,
-        comments: Array.isArray(updatedComments)
-          ? updatedComments
-          : [...(prev.comments || []), updatedComments],
+        comments: [...(prev.comments || []), newComment],
       }));
 
       setCommentText("");
+      setError(""); // Clear any previous errors
     } catch (err) {
-      console.error("Error adding comment:", err);
-      setError(err.response?.data?.message || "Failed to add comment");
+      console.error("Error adding comment:", {
+        message: err.message,
+        response: err.response
+          ? {
+              status: err.response.status,
+              data: err.response.data,
+              headers: err.response.headers,
+            }
+          : null,
+        request: err.request ? err.request : null,
+        config: err.config,
+      });
+      setError(
+        err.response?.data?.message || err.message || "Failed to add comment"
+      );
     }
   };
 
@@ -313,22 +359,6 @@ const LessonDetail = () => {
 
       {/* Action Buttons */}
       <div className='d-flex justify-content-end gap-2 mb-4'>
-        <Button
-          variant={isFavorite ? "danger" : "outline-danger"}
-          onClick={toggleFavorite}
-        >
-          {isFavorite ? <FaHeart /> : <FaRegHeart />}
-          <span className='ms-2'>Favorite</span>
-        </Button>
-
-        <Button
-          variant={isLiked ? "primary" : "outline-primary"}
-          onClick={toggleLike}
-        >
-          {isLiked ? <FaThumbsUp /> : <FaRegThumbsUp />}
-          <span className='ms-2'>{likes || 0}</span>
-        </Button>
-
         <Button variant='warning' onClick={() => setIsEditing(!isEditing)}>
           <FaEdit /> {isEditing ? "Cancel Edit" : "Edit Lesson"}
         </Button>
@@ -424,17 +454,19 @@ const LessonDetail = () => {
                     />
                   </Form.Group>
                 </Col>
-                {/* <Col md={4}>
-                  <Form.Group>
-                    <Form.Label>Image URL</Form.Label>
-                    <Form.Control
-                      type="text"
-                      name="imageUrl"
-                      value={lesson.imageUrl || ''}
-                      readOnly
-                    />
-                  </Form.Group>
-                </Col> */}
+                {
+                  <Col md={4}>
+                    <Form.Group>
+                      <Form.Label>Image URL</Form.Label>
+                      <Form.Control
+                        type='text'
+                        name='imageUrl'
+                        value={lesson.imageUrl || ""}
+                        readOnly
+                      />
+                    </Form.Group>
+                  </Col>
+                }
                 <Col md={6}>
                   <Form.Group className='mb-3'>
                     <Form.Label>Course Banner Image</Form.Label>
@@ -596,41 +628,7 @@ const LessonDetail = () => {
             onSelect={(k) => setActiveTab(k)}
             className='mb-3'
           >
-            <Tab eventKey='overview' title='Overview'>
-              <Card className='shadow-sm mb-4'>
-                <Card.Body>
-                  <h5 className='mb-3'>Ingredients</h5>
-                  {lesson.ingredients?.length > 0 ? (
-                    <ListGroup variant='flush'>
-                      {lesson.ingredients.map((ingredient, index) => (
-                        <ListGroup.Item key={index}>
-                          {ingredient}
-                        </ListGroup.Item>
-                      ))}
-                    </ListGroup>
-                  ) : (
-                    <Alert variant='info'>No ingredients listed</Alert>
-                  )}
-                </Card.Body>
-              </Card>
-
-              <Card className='shadow-sm'>
-                <Card.Body>
-                  <h5 className='mb-3'>Steps</h5>
-                  {lesson.steps?.length > 0 ? (
-                    <ListGroup as='ol' numbered>
-                      {lesson.steps.map((step, index) => (
-                        <ListGroup.Item as='li' key={index}>
-                          {step}
-                        </ListGroup.Item>
-                      ))}
-                    </ListGroup>
-                  ) : (
-                    <Alert variant='info'>No steps provided</Alert>
-                  )}
-                </Card.Body>
-              </Card>
-            </Tab>
+           
 
             <Tab
               eventKey='lessons'
@@ -638,28 +636,56 @@ const LessonDetail = () => {
             >
               <div className='mt-4'>
                 {lesson.lessons?.length > 0 ? (
-                  <Accordion defaultActiveKey='0'>
-                    <Accordion.Item eventKey='0'>
-                      <Accordion.Header>Ingredients</Accordion.Header>
-                      <Accordion.Body>
-                        <ul>
-                          {lesson.ingredients?.map((item, i) => (
-                            <li key={i}>{item}</li>
-                          ))}
-                        </ul>
-                      </Accordion.Body>
-                    </Accordion.Item>
-                    <Accordion.Item eventKey='1'>
-                      <Accordion.Header>Steps</Accordion.Header>
-                      <Accordion.Body>
-                        <ol>
-                          {lesson.steps?.map((step, i) => (
-                            <li key={i}>{step}</li>
-                          ))}
-                        </ol>
-                      </Accordion.Body>
-                    </Accordion.Item>
-                  </Accordion>
+                  <div className='list-group'>
+                    {lesson.lessons.map((lessonItem, index) => (
+                      <div
+                        key={index}
+                        className='list-group-item mb-3 p-3 shadow-sm'
+                      >
+                        <div className='d-flex justify-content-between align-items-start mb-2'>
+                          <h5 className='mb-0'>
+                            Lesson {index + 1}:{" "}
+                            {lessonItem.title || "New Lesson"}
+                          </h5>
+                          {lessonItem.duration && (
+                            <Badge bg='info' className='ms-2'>
+                              <FaClock className='me-1' />
+                              {lessonItem.duration}
+                            </Badge>
+                          )}
+                        </div>
+
+                        {lessonItem.url && (
+                          <div className='mb-3'>
+                            <a
+                              href={lessonItem.url}
+                              target='_blank'
+                              rel='noopener noreferrer'
+                              className='btn btn-sm btn-danger d-inline-flex align-items-center'
+                            >
+                              <FaYoutube className='me-2' />
+                              Watch Video
+                            </a>
+                            <small className='text-muted ms-2'>
+                              (
+                              {new URL(lessonItem.url).hostname.replace(
+                                "www.",
+                                ""
+                              )}
+                              )
+                            </small>
+                          </div>
+                        )}
+
+                        <div className='mb-2'>
+                          <h6 className='d-inline-block mb-0'>Content:</h6>
+                          <p className='mt-1'>
+                            {lessonItem.lessonContent || "No content provided yet."}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 ) : (
                   <Alert variant='info'>
                     No lessons available for this course
@@ -668,56 +694,6 @@ const LessonDetail = () => {
               </div>
             </Tab>
 
-            <Tab
-              eventKey='comments'
-              title={`Comments (${lesson.comments?.length || 0})`}
-            >
-              <div className='mt-4'>
-                <Form.Group className='mb-4'>
-                  <Form.Control
-                    as='textarea'
-                    rows={3}
-                    value={commentText}
-                    onChange={(e) => setCommentText(e.target.value)}
-                    placeholder='Share your thoughts about this course...'
-                  />
-                  <Button
-                    variant='primary'
-                    className='mt-2'
-                    onClick={addComment}
-                    disabled={!commentText.trim()}
-                  >
-                    <FaComment className='me-2' /> Post Comment
-                  </Button>
-                </Form.Group>
-
-                {lesson.comments?.length > 0 ? (
-                  <ListGroup variant='flush'>
-                    {lesson.comments.map((comment, index) => (
-                      <ListGroup.Item key={index}>
-                        <div className='d-flex justify-content-between'>
-                          <strong>
-                            {comment.user?.name ||
-                              comment.username ||
-                              "Anonymous"}
-                          </strong>
-                          <small className='text-muted'>
-                            {comment.createdAt
-                              ? moment(comment.createdAt).fromNow()
-                              : "Just now"}
-                          </small>
-                        </div>
-                        <div className='mt-2'>{comment.text}</div>
-                      </ListGroup.Item>
-                    ))}
-                  </ListGroup>
-                ) : (
-                  <Alert variant='info'>
-                    No comments yet. Be the first to comment!
-                  </Alert>
-                )}
-              </div>
-            </Tab>
 
             <Tab eventKey='stats' title='Statistics'>
               <Card className='shadow-sm'>

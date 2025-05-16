@@ -20,7 +20,8 @@ public class Course {
     private String ageRecommendation;
     private String duration;
     private String imageUrl;
-
+    private String ingredients;
+    private String steps;
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CourseLesson> lessons = new ArrayList<>();
 
@@ -172,6 +173,20 @@ public class Course {
     public void removeLesson(CourseLesson lesson) {
         lessons.remove(lesson);
         lesson.setCourse(null);
+    }
+    public String setingredients() {
+        return ingredients ;
+    }
+   
+    public String getingredients() {
+        return ingredients ;
+    }
+    
+    public String setsteps() {
+        return  steps;
+    }
+    public String getsteps() {
+        return  steps;
     }
 
     @Override

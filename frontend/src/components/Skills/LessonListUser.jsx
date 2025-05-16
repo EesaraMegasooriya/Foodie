@@ -169,42 +169,90 @@ const LessonListUser = () => {
 
   return (
     <Container className='py-4'>
-      <h2 className='text-center mb-4 fw-bold'>Discover Cooking Lessons</h2>
-
-      <div className='d-flex justify-content-between mb-3'>
-        <Button
-          variant='success'
-          size='sm'
-          onClick={() => navigate("/skills/add-lesson")} // Adjust the route as needed
-          className='me-2'
-          style={{
-            background: "linear-gradient(135deg, #28a745 0%, #20c997 100%)",
-            border: "none",
-            boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
-            fontWeight: "600",
-          }}
-        >
-          + Create Lesson
-        </Button>
-
-        <div>
-          <Button
-            variant={viewMode === "table" ? "primary" : "outline-primary"}
-            size='sm'
-            onClick={() => setViewMode("table")}
-            className='me-2'
-          >
-            Table View
-          </Button>
-          <Button
-            variant={viewMode === "grid" ? "primary" : "outline-primary"}
-            size='sm'
-            onClick={() => setViewMode("grid")}
-          >
-            Grid View
-          </Button>
-        </div>
+          <div style={{
+        background: 'linear-gradient(135deg, #FFC107 0%, #FFA000 100%)',
+        borderRadius: '0.5rem',
+        padding: '1.5rem',
+        marginBottom: '2rem',
+        boxShadow: '0 4px 12px rgba(255, 193, 7, 0.3)',
+        textAlign: 'center',
+        color: '#fff'
+      }}>
+               <h2 className='text-center mb-4 fw-bold' style={{ color: '#000' }}>
+          Discover Cooking Lessons
+        </h2>
       </div>
+
+
+      <div className="d-flex justify-content-between mb-3 align-items-center">
+  <Button
+    variant="warning"
+    onClick={() => navigate('/skills/add')}
+    className="d-flex align-items-center create-lesson-btn"
+    style={{
+      background: 'linear-gradient(135deg, #FFC107 0%, #FFA000  100%)',
+      border: 'none',
+      borderRadius: '0.25rem',
+      padding: '8px 24px',
+      boxShadow: '0 1px 2px rgba(0,0,0,0.1)',
+      fontWeight: '500',
+      transition: 'all 0.3s ease',
+      color: '#fff',
+      textTransform: 'uppercase',
+      position: 'relative',
+      overflow: 'hidden',
+      letterSpacing: '0.5px'
+    }}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.transform = 'translateY(-2px)';
+      e.currentTarget.style.boxShadow = '0 6px 12px rgba(0,0,0,0.15)';
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.transform = 'translateY(0)';
+      e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
+    }}
+  >
+    <span style={{
+        display: 'inline-block',
+        marginRight: '8px',
+        fontSize: '1.3em',
+        fontWeight: 'bold',
+        transform: 'scale(1.3)',
+        textShadow: '0 1px 2px rgba(0,0,0,0.2)',
+        transition: 'all 0.3s ease'
+      }}>+</span>
+      Create Lesson
+  </Button>
+  
+ {/* Updated View Toggle Buttons */}
+<div className="d-flex">
+  <Button
+    variant={viewMode === 'table' ? 'warning' : 'outline-warning'}
+    size="sm"
+    onClick={() => setViewMode('table')}
+    className="me-2"
+    style={{
+      fontWeight: '500',
+      letterSpacing: '0.5px',
+      borderColor: viewMode === 'table' ? 'transparent' : '#ffc107'
+    }}
+  >
+    <i className="fas fa-table me-1"></i> Table
+  </Button>
+  <Button
+    variant={viewMode === 'grid' ? 'warning' : 'outline-warning'}
+    size="sm"
+    onClick={() => setViewMode('grid')}
+    style={{
+      fontWeight: '500',
+      letterSpacing: '0.5px',
+      borderColor: viewMode === 'grid' ? 'transparent' : '#ffc107'
+    }}
+  >
+    <i className="fas fa-th-large me-1"></i> Grid
+  </Button>
+</div>
+</div>
 
       <Card className='mb-4 p-3 shadow-sm'>
         <Form>
@@ -274,6 +322,12 @@ const LessonListUser = () => {
           <h4 className='text-muted'>No lessons found</h4>
           <Button
             variant='warning'
+            style={{
+          background: 'linear-gradient(135deg, #FFC107 0%, #FFA000 100%)',
+          border: 'none',
+          color: '#fff',
+          fontWeight: '500'
+        }}
             onClick={() => {
               setSearchTerm("");
               setFilters({
@@ -319,9 +373,14 @@ const LessonListUser = () => {
                 <td>{lesson.category}</td>
                 <td>
                   <Button
-                    variant='info'
+                    variant='warning'
                     size='sm'
                     onClick={() => handleView(lesson._id)}
+                    style={{
+                  background: 'linear-gradient(135deg, #FFC107 0%, #FFA000 100%)',
+                  border: 'none',
+                  color: '#fff'
+                }}
                   >
                     <FaEye /> View
                   </Button>
@@ -390,6 +449,11 @@ const LessonListUser = () => {
                       variant='warning'
                       size='sm'
                       onClick={() => handleView(lesson.id)}
+                      style={{
+                    background: 'linear-gradient(135deg, #FFC107 0%, #FFA000 100%)',
+                    border: 'none',
+                    color: '#fff'
+                  }}
                     >
                       View Details
                     </Button>
@@ -405,10 +469,15 @@ const LessonListUser = () => {
                       </Button>
 
                       <Button
-                        variant={lesson.liked ? "primary" : "outline-primary"}
+                        variant={lesson.liked ? "warning" : "outline-warning"}
                         onClick={() => toggleLike(lesson.id)}
                         size='sm'
                         title='Like'
+                        style={lesson.liked ? {
+                        background: 'linear-gradient(135deg, #FFC107 0%, #FFA000 100%)',
+                        border: 'none',
+                        color: '#fff'
+                    } : {}}
                       >
                         {lesson.liked ? <FaThumbsUp /> : <FaRegThumbsUp />}
                         <span className='ms-1'>{lesson.likesCount || 0}</span>

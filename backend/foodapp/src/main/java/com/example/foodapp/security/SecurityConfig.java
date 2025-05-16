@@ -1,4 +1,5 @@
 package com.example.foodapp.security;
+
 import com.example.foodapp.service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -6,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -37,6 +39,7 @@ public class SecurityConfig {
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         configuration.setAllowCredentials(true);
+        configuration.setExposedHeaders(List.of("Authorization")); // Expose Authorization header
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
@@ -48,12 +51,14 @@ public class SecurityConfig {
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .formLogin(form -> form.disable())
             .httpBasic(basic -> basic.disable())
             .logout(logout -> logout.disable())
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**", "/oauth2/**", "/uploads/**", "/api/courses").permitAll()
                 .requestMatchers("/*.jpg", "/*.png", "/*.jpeg").permitAll()
+                .requestMatchers("/api/courses/*/comments").authenticated()
                 .anyRequest().authenticated()
             )
             .exceptionHandling(ex -> ex
