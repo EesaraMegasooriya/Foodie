@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Table(name = "users")
 @Data
@@ -16,8 +19,10 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
+    private String username; // Preserving from HEAD
 
+    private String name;
+    
     @Column(unique = true, nullable = false)
     private String email;
 
@@ -26,4 +31,10 @@ public class User {
     private String role; // e.g., ADMIN, CUSTOMER, etc.
 
     private String provider; // "local" or "google"
+
+    @ManyToMany(mappedBy = "likedUsers")
+    private Set<Course> likedCourses = new HashSet<>();
+
+    @ManyToMany(mappedBy = "favouritedUsers")
+    private Set<Course> favouritedCourses = new HashSet<>();
 }
