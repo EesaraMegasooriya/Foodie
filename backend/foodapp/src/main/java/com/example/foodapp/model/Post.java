@@ -1,12 +1,6 @@
 package com.example.foodapp.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-
+import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,23 +11,24 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(length = 200)
     private String caption;
 
-    private int likes;
+    private int likes = 0;
 
     @ElementCollection
-    private List<String> comments;
+    private List<String> comments = new ArrayList<>();
 
-    @Column(nullable = true)
-    private String fileName;  // ✅ Add this field to store the uploaded file name
+    @ElementCollection
+    private List<String> mediaPaths = new ArrayList<>();
 
-    // Constructor
-    public Post() {
-        this.likes = 0;
-        this.comments = new ArrayList<>();
+    public Post() {}
+
+    public Post(String caption, List<String> mediaPaths) {
+        this.caption = caption;
+        this.mediaPaths = mediaPaths;
     }
 
-    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -62,11 +57,27 @@ public class Post {
         this.comments = comments;
     }
 
-    public String getFileName() {  // ✅ Getter for fileName
-        return fileName;
+    public void addComment(String comment) {
+        if (this.comments.size() < 10) {
+            this.comments.add(comment);
+        }
     }
 
-    public void setFileName(String fileName) {  // ✅ Setter for fileName
-        this.fileName = fileName;
+    public List<String> getMediaPaths() {
+        return mediaPaths;
+    }
+
+    public void setMediaPaths(List<String> mediaPaths) {
+        this.mediaPaths = mediaPaths;
+    }
+
+    public void incrementLikes() {
+        this.likes++;
+    }
+
+    public void decrementLikes() {
+        if (this.likes > 0) {
+            this.likes--;
+        }
     }
 }

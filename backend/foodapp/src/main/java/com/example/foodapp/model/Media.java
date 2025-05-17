@@ -15,9 +15,9 @@ public class Media {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String type; // "photo" or "video"
+    private String type; // "image" or "video"
 
-    private String url; // where the photo/video is stored
+    private String url; // local path like "uploads/filename.jpg"
 
     @ManyToOne
     @JoinColumn(name = "post_id")

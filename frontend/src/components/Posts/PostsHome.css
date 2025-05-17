@@ -1,39 +1,111 @@
-/* Custom styles for posts */
+/* PostsHome.css */
+
+/* Card container adjustments */
 .card {
   border: none;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  border-radius: 1rem;
+  overflow: hidden;
+  transition: transform 0.2s ease;
+}
+.card:hover {
+  transform: translateY(-4px);
 }
 
-.card-img-top {
-  object-fit: cover;
-  height: 350px; /* Ensure image height is consistent */
-}
-
-.card-header {
-  background-color: #fff;
-  border-bottom: 1px solid #ddd;
-}
-
+/* Card body padding */
 .card-body {
-  padding: 0.5rem 1rem;
+  padding: 1rem;
 }
 
-.card-title {
-  font-size: 1.25rem;
-  font-weight: bold;
+/* Media grid for images/videos */
+.media-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
 }
 
-.btn-link {
-  font-size: 0.875rem;
-  font-weight: bold;
-  color: #333;
-}
-
-.btn-link:hover {
-  color: #007bff;
-}
-
-/* Modal styling */
-.modal-content {
+/* Individual media items (img/video) */
+.media-item {
+  flex: 1 1 calc(100% / 1 - 0.5rem); /* full width on small, auto-adjust on larger */
+  max-height: 300px;
+  object-fit: cover;
   border-radius: 0.5rem;
+}
+
+/* Post caption styling */
+.card-body p {
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+/* Reaction buttons */
+.btn-outline-danger,
+.btn-outline-secondary {
+  font-size: 0.9rem;
+}
+.btn-outline-danger:hover,
+.btn-outline-secondary:hover {
+  opacity: 0.85;
+}
+
+/* Comments list */
+.list-group {
+  padding-left: 0;
+  margin-bottom: 0.75rem;
+}
+.list-group-item {
+  padding: 0.5rem 0.75rem;
+  border: none;
+  border-bottom: 1px solid #eee;
+  font-size: 0.875rem;
+}
+.list-group-item:last-child {
+  border-bottom: none;
+}
+
+/* Comment input group */
+.d-flex .form-control {
+  flex: 1;
+  border-radius: 0.5rem 0 0 0.5rem;
+}
+.d-flex .btn {
+  border-radius: 0 0.5rem 0.5rem 0;
+}
+
+/* Error alert */
+.alert-danger {
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+/* Section title */
+h6 {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Overall container tweaks */
+.container.mt-5 {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+/* Create New Post button */
+.text-center .btn-warning {
+  padding: 0.75rem 1.5rem;
+  font-weight: bold;
+}
+
+/* Responsive adjustments */
+@media (min-width: 768px) {
+  .media-item {
+    flex: 1 1 calc(50% - 0.5rem);
+  }
+}
+@media (min-width: 992px) {
+  .media-item {
+    flex: 1 1 calc(33.333% - 0.5rem);
+  }
 }

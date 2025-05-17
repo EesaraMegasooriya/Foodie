@@ -21,7 +21,7 @@ const PostList = () => {
   const handleLike = async (postId) => {
     try {
       await axios.post(`http://localhost:8080/posts/${postId}/like`);
-      fetchPosts(); // refresh posts
+      fetchPosts();
     } catch (error) {
       console.error('Error liking post:', error);
     }
@@ -33,13 +33,13 @@ const PostList = () => {
 
   const handleAddComment = async (postId) => {
     try {
-      await axios.post(`http://localhost:8080/posts/${postId}/comment`, newComment[postId], {
-        headers: {
-          'Content-Type': 'text/plain', // because only text is sent
-        },
-      });
-      setNewComment((prev) => ({ ...prev, [postId]: '' })); // clear input
-      fetchPosts(); // refresh posts
+      await axios.post(
+        `http://localhost:8080/posts/${postId}/comment`,
+        newComment[postId],
+        { headers: { 'Content-Type': 'text/plain' } }
+      );
+      setNewComment((prev) => ({ ...prev, [postId]: '' }));
+      fetchPosts();
     } catch (error) {
       console.error('Error adding comment:', error);
     }
@@ -52,15 +52,21 @@ const PostList = () => {
         <div key={post.id} className="card mb-3">
           <div className="card-body">
             <h5 className="card-title">{post.caption}</h5>
-            <p className="card-text">Likes: {post.likes}</p>
-            <button
-              className="btn btn-outline-primary btn-sm me-2"
-              onClick={() => handleLike(post.id)}
-            >
+            <div className="d-flex flex-wrap gap-2">
+              {post.mediaUrls.map((url, index) =>
+                url.endsWith('.mp4') ? (
+                  <video key={index} controls width="200">
+                    <source src={`http://localhost:8080/${url}`} type="video/mp4" />
+                  </video>
+                ) : (
+                  <img key={index} src={`http://localhost:8080/${url}`} alt="media" width="200" />
+                )
+              )}
+            </div>
+            <p className="card-text mt-2">Likes: {post.likes}</p>
+            <button className="btn btn-outline-primary btn-sm me-2" onClick={() => handleLike(post.id)}>
               Like ❤️
             </button>
-
-            {/* Comment input */}
             <div className="mt-3">
               <input
                 type="text"
@@ -69,23 +75,16 @@ const PostList = () => {
                 value={newComment[post.id] || ''}
                 onChange={(e) => handleCommentChange(post.id, e.target.value)}
               />
-              <button
-                className="btn btn-success btn-sm"
-                onClick={() => handleAddComment(post.id)}
-              >
+              <button className="btn btn-success btn-sm" onClick={() => handleAddComment(post.id)}>
                 Comment 💬
               </button>
             </div>
-
-            {/* Show comments */}
             {post.comments && post.comments.length > 0 && (
               <div className="mt-3">
                 <h6>Comments:</h6>
                 <ul className="list-group">
                   {post.comments.map((comment, index) => (
-                    <li key={index} className="list-group-item">
-                      {comment}
-                    </li>
+                    <li key={index} className="list-group-item">{comment}</li>
                   ))}
                 </ul>
               </div>

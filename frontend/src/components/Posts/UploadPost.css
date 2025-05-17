@@ -1,0 +1,25 @@
+/* src/components/Posts/PostsHome.css */
+.card {
+  border: none;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  border-radius: 1rem;
+  overflow: hidden;
+}
+.card-body { padding: 1rem; }
+.media-grid {
+  display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem;
+}
+.media-item {
+  flex: 1 1 calc(50% - 0.5rem);
+  max-height: 200px;
+  object-fit: cover;
+  border-radius: 0.5rem;
+}
+.btn-sm { font-size: 0.9rem; }
+.list-group-item {
+  border: none; border-bottom: 1px solid #eee;
+  padding: 0.5rem;
+}
+@media (min-width:768px) {
+  .media-item { flex: 1 1 calc(33.333% - 0.5rem); }
+}

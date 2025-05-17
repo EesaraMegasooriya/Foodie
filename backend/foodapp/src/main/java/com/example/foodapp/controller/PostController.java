@@ -1,150 +1,101 @@
+// src/main/java/com/example/foodapp/controller/PostController.java
 package com.example.foodapp.controller;
 
-import com.example.foodapp.model.*;
+import com.example.foodapp.model.Comment;
+import com.example.foodapp.model.Post;
 import com.example.foodapp.service.PostService;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/posts")
-@CrossOrigin(origins = "http://localhost:5173")
 public class PostController {
 
-    private static final String UPLOAD_DIR = "uploads/";
-
-    private final PostService postService;
-
     @Autowired
-    public PostController(PostService postService) {
-        this.postService = postService;
-    }
+    private PostService postService;
 
     @PostMapping("/upload")
     public ResponseEntity<?> uploadPost(
-            @RequestParam("caption") String caption,
-            @RequestParam(value = "files", required = false) List<MultipartFile> files) {
-
-        if (caption == null || caption.trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("Caption is required");
-        }
-
-        List<Media> mediaList = new ArrayList<>();
-        if (files != null && !files.isEmpty()) {
-            if (files.size() > 3) {
-                return ResponseEntity.badRequest().body("Max 3 media files allowed");
-            }
-
-            for (MultipartFile file : files) {
-                try {
-                    File uploadDir = new File(UPLOAD_DIR);
-                    if (!uploadDir.exists()) uploadDir.mkdirs();
-
-                    String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-                    Path filePath = Paths.get(UPLOAD_DIR + fileName);
-                    Files.write(filePath, file.getBytes());
-
-                    String fileType = file.getContentType().startsWith("video") ? "video" : "image";
-
-                    Media media = new Media();
-                    media.setFileName(fileName);
-                    media.setFileType(fileType);
-                    mediaList.add(media);
-
-                } catch (IOException e) {
-                    return ResponseEntity.internalServerError().body("Error uploading file: " + file.getOriginalFilename());
-                }
-            }
-        }
-
-        Post post = new Post();
-        post.setCaption(caption);
-        post.setLikes(0);
-        post.setComments(new ArrayList<>());
-        post.setMedia(mediaList);
-
+            @RequestParam String caption,
+            @RequestParam List<MultipartFile> files) {
         try {
-            Post saved = postService.createPost(post, mediaList);
-            return ResponseEntity.ok(saved);
+            Post saved = postService.createPost(caption, files);
+            return new ResponseEntity<>(saved, HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-
-    @PostMapping("/{id}/like")
-    public ResponseEntity<?> likePost(@PathVariable Long id) {
-        Reaction reaction = postService.reactToPost(id, 1L, "LIKE"); // Replace 1L with actual userId
-        if (reaction == null) return ResponseEntity.notFound().build();
-        return ResponseEntity.ok("Post liked!");
-    }
-
-    @PostMapping("/{id}/unlike")
-    public ResponseEntity<?> unlikePost(@PathVariable Long id) {
-        Reaction reaction = postService.reactToPost(id, 1L, "UNLIKE"); // Replace 1L with actual userId
-        if (reaction == null) return ResponseEntity.notFound().build();
-        return ResponseEntity.ok("Post unliked!");
-    }
-
-    @PostMapping("/{id}/comment")
-    public ResponseEntity<?> addComment(@PathVariable Long id, @RequestBody String commentText) {
-        if (commentText == null || commentText.trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("Comment cannot be empty");
-        }
-
-        Comment comment = new Comment();
-        comment.setContent(commentText);
-
-        try {
-            Comment saved = postService.addComment(id, comment);
-            return ResponseEntity.ok(saved);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                 .body("Error uploading post");
         }
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllPosts() {
-        return ResponseEntity.ok(postService.getAllPosts());
+    public ResponseEntity<List<Map<String,Object>>> getAllPosts() {
+        List<Post> list = postService.getAllPosts();
+        var dto = list.stream().map(p -> {
+            Map<String,Object> m = new HashMap<>();
+            m.put("id", p.getId());
+            m.put("caption", p.getCaption());
+            m.put("likes", p.getLikes());
+            m.put("mediaPaths", p.getMediaPaths());
+            List<String> cmts = postService.getComments(p.getId())
+                                           .stream()
+                                           .map(Comment::getContent)
+                                           .toList();
+            m.put("comments", cmts);
+            return m;
+        }).toList();
+        return ResponseEntity.ok(dto);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getPostById(@PathVariable Long id) {
-        Optional<Post> post = postService.getAllPosts().stream().filter(p -> p.getId().equals(id)).findFirst();
-        return post.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    @PostMapping("/{id}/like")
+    public ResponseEntity<String> like(@PathVariable Long id) {
+        try {
+            postService.likePost(id);
+            return ResponseEntity.ok("Liked");
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Post not found");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/{id}/unlike")
+    public ResponseEntity<String> unlike(@PathVariable Long id) {
+        try {
+            postService.unlikePost(id);
+            return ResponseEntity.ok("Unliked");
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Post not found");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/{id}/comment")
+    public ResponseEntity<String> comment(
+            @PathVariable Long id,
+            @RequestBody Map<String,String> body) {
+        try {
+            String txt = body.get("comment");
+            postService.addComment(id, txt);
+            return ResponseEntity.ok("Comment added");
+        } catch (NoSuchElementException|IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @GetMapping("/{id}/comments")
     public ResponseEntity<?> getComments(@PathVariable Long id) {
-        Optional<Post> post = postService.getAllPosts().stream().filter(p -> p.getId().equals(id)).findFirst();
-        return post.map(p -> ResponseEntity.ok(p.getComments()))
-                   .orElse(ResponseEntity.notFound().build());
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deletePost(@PathVariable Long id) {
-        Optional<Post> post = postService.getAllPosts().stream().filter(p -> p.getId().equals(id)).findFirst();
-        if (post.isEmpty()) return ResponseEntity.notFound().build();
-
-        // Optional: delete media files here if needed
-
-        postService.deletePost(id);
-        return ResponseEntity.ok("Post deleted");
-    }
-
-    public static String getUploadDir() {
-        return UPLOAD_DIR;
-    }
-
-    public PostService getPostService() {
-        return postService;
+        try {
+            return ResponseEntity.ok(postService.getComments(id));
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 }
