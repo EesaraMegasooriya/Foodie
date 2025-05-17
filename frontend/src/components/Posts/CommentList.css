@@ -1,0 +1,9 @@
+/* Light grey background for comment items */
+.list-group-item {
+  background-color: #f8f9f9;
+}
+
+/* Separate adjacent comments with a light border */
+.list-group-item + .list-group-item {
+  border-top: 1px solid #e9ecef;
+}

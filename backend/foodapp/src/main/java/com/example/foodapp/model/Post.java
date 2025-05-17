@@ -1,32 +1,35 @@
 package com.example.foodapp.model;
 
-import jakarta.persistence.*;
-import java.util.ArrayList;
+import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
+@Table(name = "posts")
 public class Post {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 200)
+    /** Text caption for the post */
+    @Column(length = 1000)
     private String caption;
 
-    private int likes = 0;
+    /** When the post was created */
+    private LocalDateTime createdAt;
 
-    @ElementCollection
-    private List<String> comments = new ArrayList<>();
+    /**
+     * List of media items (images/videos) attached to this post.
+     * Up to 3 files per post.
+     */
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Media> media;
 
-    @ElementCollection
-    private List<String> mediaPaths = new ArrayList<>();
+    // Constructors, getters, setters
 
-    public Post() {}
-
-    public Post(String caption, List<String> mediaPaths) {
-        this.caption = caption;
-        this.mediaPaths = mediaPaths;
+    public Post() {
+        this.createdAt = LocalDateTime.now();
     }
 
     public Long getId() {
@@ -41,43 +44,15 @@ public class Post {
         this.caption = caption;
     }
 
-    public int getLikes() {
-        return likes;
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
-    public void setLikes(int likes) {
-        this.likes = likes;
+    public List<Media> getMedia() {
+        return media;
     }
 
-    public List<String> getComments() {
-        return comments;
-    }
-
-    public void setComments(List<String> comments) {
-        this.comments = comments;
-    }
-
-    public void addComment(String comment) {
-        if (this.comments.size() < 10) {
-            this.comments.add(comment);
-        }
-    }
-
-    public List<String> getMediaPaths() {
-        return mediaPaths;
-    }
-
-    public void setMediaPaths(List<String> mediaPaths) {
-        this.mediaPaths = mediaPaths;
-    }
-
-    public void incrementLikes() {
-        this.likes++;
-    }
-
-    public void decrementLikes() {
-        if (this.likes > 0) {
-            this.likes--;
-        }
+    public void setMedia(List<Media> media) {
+        this.media = media;
     }
 }

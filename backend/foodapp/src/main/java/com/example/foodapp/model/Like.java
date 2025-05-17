@@ -4,42 +4,34 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "comments")
-public class Comment {
+@Table(
+    name = "likes",
+    uniqueConstraints = {@UniqueConstraint(columnNames = {"post_id", "user_id"})}
+)
+public class Like {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /** Text content of the comment */
-    @Column(length = 1000, nullable = false)
-    private String text;
-
-    /** When the comment was created */
-    private LocalDateTime createdAt;
-
-    /**
-     * The post to which this comment belongs.
-     * Enforce “max 10 comments per user per post” at the service layer.
-     */
+    /** The post that was liked */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
-    /**
-     * The user who authored the comment.
-     * Make sure you have a User entity in com.example.foodapp.model.
-     */
+    /** The user who liked the post */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    public Comment() {
+    /** When the like was created */
+    private LocalDateTime createdAt;
+
+    public Like() {
         this.createdAt = LocalDateTime.now();
     }
 
-    public Comment(String text, Post post, User user) {
-        this.text = text;
+    public Like(Post post, User user) {
         this.post = post;
         this.user = user;
         this.createdAt = LocalDateTime.now();
@@ -49,18 +41,6 @@ public class Comment {
 
     public Long getId() {
         return id;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
     }
 
     public Post getPost() {
@@ -77,5 +57,9 @@ public class Comment {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 }

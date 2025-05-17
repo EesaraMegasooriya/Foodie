@@ -1,0 +1,15 @@
+/* src/components/Posts/PostFeed.css */
+
+/* Layout and spacing for the feed */
+.post-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem; /* space between post cards */
+}
+
+/* Centered, muted text for loading & empty states */
+.loading,
+.no-posts {
+  text-align: center;
+  color: #6c757d;
+}

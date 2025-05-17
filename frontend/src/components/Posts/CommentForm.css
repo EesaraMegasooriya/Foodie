@@ -1,0 +1,11 @@
+/* Ensure the comment form’s input and button sit side by side with some gap */
+.comment-form {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+/* Make the text input expand to fill available space */
+.comment-form .form-control {
+  flex: 1;
+}

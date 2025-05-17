@@ -1,67 +1,77 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../../api';
 import { useNavigate } from 'react-router-dom';
-import './PostForm.css';  // Import custom CSS for post form
 
-const PostForm = () => {
+export default function PostForm({ currentUserId }) {
   const [caption, setCaption] = useState('');
-  const [file, setFile] = useState(null);
+  const [files, setFiles] = useState([]);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
+
+  const handleFileChange = (e) => {
+    const selected = Array.from(e.target.files).slice(0, 3);
+    if (selected.length > 3) {
+      setError('You can upload up to 3 files only.');
+      return;
+    }
+    setError('');
+    setFiles(selected);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    if (!caption.trim() && files.length === 0) {
+      setError('Please add a caption or at least one media file.');
+      return;
+    }
     const formData = new FormData();
     formData.append('caption', caption);
-    formData.append('file', file);
+    formData.append('userId', currentUserId);
+    files.forEach((file) => formData.append('files', file));
 
     try {
-      await axios.post('http://localhost:8080/posts/upload', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+      await api.post('/posts', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
-
-      alert('Post created successfully!');
-      navigate('/posts');
-    } catch (error) {
-      console.error(error);
-      alert('Error submitting the post. Please try again.');
+      navigate('/');
+    } catch (err) {
+      console.error(err);
+      setError('Failed to create post. Please try again.');
     }
   };
 
   return (
-    <div className="container mt-5 post-form-container">
-      <h2 className="mb-4 text-center">Create a New Post</h2>
-      <form onSubmit={handleSubmit} encType="multipart/form-data">
-        <div className="mb-3">
-          <label htmlFor="caption" className="form-label">Title</label>
-          <input
-            type="text"
-            id="caption"
-            className="form-control"
-            value={caption}
-            onChange={(e) => setCaption(e.target.value)}
-            required
-          />
-        </div>
-
-        <div className="mb-3">
-          <label htmlFor="file" className="form-label">Upload Photo/Video</label>
-          <input
-            type="file"
-            id="file"
-            className="form-control"
-            accept="image/*,video/*"
-            onChange={(e) => setFile(e.target.files[0])}
-            required
-          />
-        </div>
-
-        <button type="submit" className="btn btn-warning btn-lg mt-4">Upload Post</button>
-      </form>
+    <div className="card">
+      <div className="card-body">
+        <h5>Create New Post</h5>
+        {error && <div className="alert alert-danger">{error}</div>}
+        <form onSubmit={handleSubmit}>
+          <div className="mb-3">
+            <textarea
+              className="form-control"
+              rows="3"
+              placeholder="Write a caption..."
+              value={caption}
+              onChange={(e) => setCaption(e.target.value)}
+            />
+          </div>
+          <div className="mb-3">
+            <input
+              type="file"
+              className="form-control"
+              accept="image/*,video/*"
+              multiple
+              onChange={handleFileChange}
+            />
+            <small className="form-text text-muted">
+              You may select up to 3 files.
+            </small>
+          </div>
+          <button type="submit" className="btn btn-primary">
+            Post
+          </button>
+        </form>
+      </div>
     </div>
   );
-};
-
-export default PostForm;
+}

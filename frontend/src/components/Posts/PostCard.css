@@ -1,0 +1,22 @@
+/* Container for images/videos */
+.media-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* Each media element */
+.media-item {
+  /* Take up roughly a third of the row, minus the gap */
+  flex: 1 1 calc(33.333% - 0.5rem);
+  max-width: calc(33.333% - 0.5rem);
+
+  /* Ensure the media covers the box without distortion */
+  object-fit: cover;
+
+  /* Rounded corners */
+  border-radius: 0.25rem;
+
+  /* Maintain a reasonable max height */
+  max-height: 200px;
+}
