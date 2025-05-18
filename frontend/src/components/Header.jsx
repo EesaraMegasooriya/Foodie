@@ -1,19 +1,24 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Navbar, Nav, Container, Button } from 'react-bootstrap';
 import { NavLink, useNavigate } from 'react-router-dom';
 import Logo from '../assets/logo.png';
+import { AuthContext } from '../context/AuthContext';
 
 function Header() {
+  const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    localStorage.clear(); // 🧹 Clears all localStorage items (jwt, name, etc.)
-    navigate('/login');   // 🔁 Redirect to login page
+    logout();
+    navigate('/login');
   };
-  
+
+  const handleLogin = () => {
+    navigate('/login');
+  };
 
   return (
-    <Navbar bg="light" expand="lg" sticky="top" className="shadow-sm mb-5">
+    <Navbar bg="light" expand="lg" sticky="top" className="shadow-sm">
       <Container>
         <Navbar.Brand as={NavLink} to="/" className="d-flex align-items-center gap-2">
           <img src={Logo} width="45" height="45" alt="Logo" />
@@ -29,10 +34,18 @@ function Header() {
             <Nav.Link as={NavLink} to="/recipes">Recipes</Nav.Link>
             <Nav.Link as={NavLink} to="/skillshare">Skillshare</Nav.Link>
 
-            {/* 🚪 Logout Button */}
-            <Button variant="outline-danger" onClick={handleLogout}>
-              Logout
-            </Button>
+            {user ? (
+              <>
+                <span className="fw-semibold text-dark">{user.name}</span>
+                <Button variant="outline-danger" onClick={handleLogout}>
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <Button variant="outline-primary" onClick={handleLogin}>
+                Login
+              </Button>
+            )}
           </Nav>
         </Navbar.Collapse>
       </Container>

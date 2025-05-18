@@ -42,17 +42,69 @@ function EventHome() {
   }, []);
 
   return (
-    <div className='p-5'>
-    <h2 className='pb-2 text-center fw-bold'>Share Your Creative Skills</h2>
-    <div className='d-flex justify-content-center'>
-    <p className='text-center w-75'>Join our creative community to host or attend art workshops and events,
-        learn new skills, teach each others and connect with fellow artists.</p>
+    <div className="p-5" style={{ backgroundColor: '#fff3cd' }}>
+      <div className="container my-5">
+  <div className="row align-items-center">
+    
+    {/* Text Left */}
+    <div className="col-md-6 p-4">
+      <h2 className="pb-2 fw-bold">Share Your Creative Skills</h2>
+      <p>
+        Join our creative community to host or attend art workshops and events,
+        learn new skills, teach each other, and connect with fellow artists.
+      </p>
     </div>
 
-    <div className='d-flex justify-content-center gap-4'>
-      <a href='/events/create'><button className='btn btn-primary'>Create Event</button></a>
-      <a href='/events/browse'><button className='btn btn-secondary'>Explore Events</button></a>
-    </div> 
+    {/* Image Right */}
+    <div className="col-md-6 text-center">
+      <img
+        src="/foodimg.png"
+        alt="Delicious Food"
+        style={{ width: '80%', maxWidth: '500px', borderRadius: '12px' }}
+        className="img-fluid shadow"
+      />
+    </div>
+    
+  </div>
+</div>
+
+
+<div className="d-flex justify-content-center gap-4 mt-4">
+  <a href="/events/create">
+    <button
+      className="px-4 py-2 fw-bold rounded"
+      style={{
+        backgroundColor: '#f8c035',
+        color: 'black',
+        border: 'none',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        transition: 'all 0.3s ease-in-out',
+      }}
+      onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#e6b830')}
+      onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#f8c035')}
+    >
+      Create Event
+    </button>
+  </a>
+
+  <a href="/events/browse">
+    <button
+      className="px-4 py-2 fw-bold rounded"
+      style={{
+        backgroundColor: '#f8c035',
+        color: 'black',
+        border: 'none',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        transition: 'all 0.3s ease-in-out',
+      }}
+      onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#e6b830')}
+      onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#f8c035')}
+    >
+      Explore Events
+    </button>
+  </a>
+</div>
+
 
     <h4 className='mt-5'>Upcoming Events</h4>
     <div>
@@ -65,7 +117,11 @@ function EventHome() {
               <Card.Body className="d-flex flex-column justify-content-between">
                 <div>
                   <div className="d-flex justify-content-between align-items-center mb-2">
-                    <Badge bg="primary">{event.category}</Badge>
+                    <Badge bg="" style={{
+        backgroundColor: '#f8c035',
+        color: 'black',
+        
+      }}>{event.category}</Badge>
                     
                   </div>
 
@@ -113,7 +169,26 @@ function EventHome() {
                   </div>
                   <div>
                     <a href={`/events/${event.id}`}>
-                                              <Button variant="outline-primary">View Details</Button>
+                    <Button
+  variant="outline-light"
+  style={{
+    color: '#f8c035',
+    border: '2px solid #f8c035',
+    fontWeight: 'bold',
+    transition: 'all 0.3s ease',
+  }}
+  onMouseOver={(e) => {
+    e.currentTarget.style.backgroundColor = '#f8c035';
+    e.currentTarget.style.color = 'black';
+  }}
+  onMouseOut={(e) => {
+    e.currentTarget.style.backgroundColor = 'transparent';
+    e.currentTarget.style.color = '#f8c035';
+  }}
+>
+  View Details
+</Button>
+
                                             </a>
                   </div>
                 </div>
