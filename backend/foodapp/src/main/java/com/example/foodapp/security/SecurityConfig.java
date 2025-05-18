@@ -60,8 +60,8 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .anyRequest().permitAll()
 
-                // .requestMatchers("/api/auth/**").permitAll()
-                // .anyRequest().authenticated()
+                 .requestMatchers("/api/recipes/**").permitAll()
+                 .anyRequest().authenticated()
             )
             .exceptionHandling(e -> e
                 .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))

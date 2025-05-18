@@ -24,6 +24,9 @@ import PostsHome from './components/Posts/PostHome';
 
 //Recipes
 import RecipesHome from './components/Recipies/RecipieHome';
+import RecipeCreate from './components/Recipies/CreateRecipe';
+import RecipeUpdate from './components/Recipies/UpdateRecipe';
+// import ViewRecipe from './components/Recipies/ViewRecipe';
 
 function App() {
   return (
@@ -44,6 +47,12 @@ function App() {
         <Route path="/skills" element={<SkillsHome />} />
         <Route path="/posts" element={<PostsHome />} />
         <Route path="/recipes" element={<RecipesHome />} />
+
+        <Route path="/recipes/create-recipe" element={<RecipeCreate />} />
+        <Route path="/recipes/update-recipe/:id" element={<RecipeUpdate />} />
+        {/* <Route path="/recipes/view-recipe/:id" element={<ViewRecipe />} /> */}
+
+
       </Routes>
       <Footer />
     </>
