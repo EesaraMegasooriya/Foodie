@@ -23,52 +23,56 @@ public class RecipeController {
 
     private static final String UPLOAD_DIR = System.getProperty("user.dir") + "/uploads/";
 
-    @PostMapping(consumes = "multipart/form-data")
-    public Recipe createRecipe(
-            @RequestParam("title") String title,
-            @RequestParam("description") String description,
-            @RequestParam("ingredients") String ingredients,
-            @RequestParam("instructions") String instructions,
-            @RequestParam("cookingTime") int cookingTime,
-            @RequestParam("image") MultipartFile image
-    ) {
-        try {
-            // Save image to disk
-            File uploadDir = new File(UPLOAD_DIR);
-            if (!uploadDir.exists()) uploadDir.mkdirs();
-
-            String filename = UUID.randomUUID() + "_" + image.getOriginalFilename();
-            String filepath = UPLOAD_DIR + filename;
-            image.transferTo(new File(filepath));
-
-            String imageUrl = "/uploads/" + filename;
-
-            // Create Recipe object manually
-            Recipe recipe = new Recipe();
-            recipe.setTitle(title);
-            recipe.setDescription(description);
-            recipe.setIngredients(List.of(ingredients.split(",")));
-            recipe.setInstructions(List.of(instructions.split(",")));
-            recipe.setCookingTime(cookingTime);
-            recipe.setImageUrl(imageUrl); // Set image URL here
-
-            // Use your existing service method to save the recipe
-            return recipeService.createRecipe(recipe); // Directly return the saved recipe
-
-        } catch (IOException e) {
-            // You can handle the error as you see fit
-            throw new RuntimeException("Error while saving the image", e);
+    @PostMapping("/")
+    public ResponseEntity<Recipe> createRecipe(
+            @RequestPart("data") Recipe recipe,
+            @RequestPart(value = "image", required = false) List<MultipartFile> images
+    ) throws IOException {
+        if (images != null && !images.isEmpty()) {
+            for (MultipartFile image : images) {
+                String fileName = UUID.randomUUID() + "_" + image.getOriginalFilename();
+                File uploadDir = new File(UPLOAD_DIR);
+                if (!uploadDir.exists()) {
+                    uploadDir.mkdirs();
+                }
+                File dest = new File(UPLOAD_DIR + fileName);
+                image.transferTo(dest);
+                // If you want to store only one image URL:
+                recipe.setImageUrl("/uploads/" + fileName);
+                // If you want to store multiple image URLs, use a List<String> in Recipe and add each URL
+            }
         }
+        Recipe saved = recipeService.createRecipe(recipe);
+        return ResponseEntity.ok(saved);
     }
-
 
     @PutMapping("/{id}")
     public ResponseEntity<Recipe> updateRecipe(@PathVariable Long id, @Valid @RequestBody Recipe recipe) {
-        return ResponseEntity.ok(recipeService.updateRecipe(id, recipe));
+        // Only update ingredients and instructions
+        Recipe existing = recipeService.getRecipeById(id);
+        if (existing == null) {
+            return ResponseEntity.notFound().build();
+        }
+        existing.setIngredients(recipe.getIngredients());
+        existing.setInstructions(recipe.getInstructions());
+        Recipe updated = recipeService.updateRecipe(id, existing);
+        return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteRecipe(@PathVariable Long id) {
+        // 1. Find the recipe to get the image URL
+        Recipe recipe = recipeService.getRecipeById(id);
+        if (recipe != null && recipe.getImageUrl() != null) {
+            // 2. Build the file path
+            String imagePath = UPLOAD_DIR + recipe.getImageUrl().replace("/uploads/", "");
+            File imageFile = new File(imagePath);
+            // 3. Delete the file if it exists
+            if (imageFile.exists()) {
+                imageFile.delete();
+            }
+        }
+        // 4. Delete the recipe from the database
         recipeService.deleteRecipe(id);
         return ResponseEntity.noContent().build();
     }

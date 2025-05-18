@@ -75,7 +75,6 @@ function RecipeCreate() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validateForm()) {
-      // Validate minimum 3 ingredients only on submit
       const filledIngredients = ingredients.filter(i => i.trim());
       if (filledIngredients.length < 3) {
         setErrors(prev => ({
@@ -85,33 +84,33 @@ function RecipeCreate() {
         return;
       }
 
-      // Create form data with images
       const formData = new FormData();
-      formData.append('title', title);
-      formData.append('description', description);
-      formData.append('cookingTime', cookingTime);
-      formData.append('ingredients', JSON.stringify(ingredients.filter(i => i.trim())));
-      formData.append('instructions', JSON.stringify(instructions.filter(i => i.text.trim()).map(i => i.text)));
-      
-      // Append each image
-      images.forEach((image, index) => {
-        formData.append(`image${index}`, image);
-      });
-
-      // Log both the form data and a plain object for better console visibility
-      console.log("Recipe Form Data:", formData);
-      console.log("Recipe Data as Object:", {
+      const recipeData = {
         title,
         description,
         cookingTime,
-        ingredients: ingredients.filter(i => i.trim()),
+        ingredients: filledIngredients,
         instructions: instructions.filter(i => i.text.trim()).map(i => i.text),
-        images: images.map(img => ({
-          name: img.name,
-          type: img.type,
-          size: img.size
-        }))
-      });
+        userid: "dummy-user"
+      };
+      formData.append('data', new Blob([JSON.stringify(recipeData)], { type: 'application/json' }));
+      images.forEach((image) => formData.append('image', image));
+
+      fetch('http://localhost:8080/api/recipes/', {
+        method: 'POST',
+        body: formData,
+      })
+        .then(res => {
+          if (res.ok) {
+            // Redirect or show success
+            navigate('/recipes');
+          } else {
+            alert('Failed to submit recipe');
+          }
+        })
+        .catch(() => {
+          alert('Network error');
+        });
     }
   };
 

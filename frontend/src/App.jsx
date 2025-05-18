@@ -50,9 +50,6 @@ function App() {
 
         <Route path="/recipes/create-recipe" element={<RecipeCreate />} />
         <Route path="/recipes/update-recipe/:id" element={<RecipeUpdate />} />
-        {/* <Route path="/recipes/view-recipe/:id" element={<ViewRecipe />} /> */}
-
-
       </Routes>
       <Footer />
     </>

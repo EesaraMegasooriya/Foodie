@@ -59,9 +59,6 @@ public class SecurityConfig {
             .logout().disable()
             .authorizeHttpRequests(auth -> auth
                 .anyRequest().permitAll()
-
-                 .requestMatchers("/api/recipes/**").permitAll()
-                 .anyRequest().authenticated()
             )
             .exceptionHandling(e -> e
                 .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
